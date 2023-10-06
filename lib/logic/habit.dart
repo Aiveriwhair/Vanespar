@@ -26,6 +26,7 @@ class Habit {
 
   Map<String, dynamic> toJson() {
     return {
+      'id' : id,
       'name': name,
       'description': description,
       'color': color,
@@ -38,6 +39,7 @@ class Habit {
     var completionDatesList = json['completionDates']?.map<DateTime>((date) => DateTime.parse(date)).toList() ?? [];
 
     return Habit(
+      id: json['id'],
       name: json['name'],
       description: json['description'],
       color: json['color'],
