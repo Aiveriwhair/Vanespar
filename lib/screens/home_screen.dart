@@ -117,14 +117,12 @@ class MyListWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    IconData someIconData = Icons.house_rounded;
-
     List<Widget> items = [
       CustomListItem(
         title: "Title",
         description: "Description",
-        isCompleted: false,
-        iconData: someIconData,
+        isCompleted: true,
+        iconData: Icons.house,
         lastDaysCompletion: const [true, false, true, false, true, false],
         color: Colors.orange,
       ),
@@ -132,16 +130,16 @@ class MyListWidget extends StatelessWidget {
         title: "Title",
         description: "Description",
         isCompleted: false,
-        iconData: someIconData,
-        lastDaysCompletion: const [true, false, true, false, true, false],
+        iconData: Icons.shower,
+        lastDaysCompletion: const [true, false, false, false, true, true],
         color: Colors.blue,
       ),
       CustomListItem(
         title: "Title",
         description: "Description",
-        isCompleted: false,
-        iconData: someIconData,
-        lastDaysCompletion: const [true, false, true, false, true, false],
+        isCompleted: true,
+        iconData: Icons.bed,
+        lastDaysCompletion: const [true, true, true, true, true, false],
         color: Colors.red,
       ),
     ];
