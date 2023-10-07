@@ -47,6 +47,7 @@ class HabitManager {
     }
     Habit habit = habits.removeAt(oldIndex);
     habits.insert(newIndex, habit);
+    _habitsStreamController.add(habits);
     _saveHabitsToPrefs();
   }
 }
