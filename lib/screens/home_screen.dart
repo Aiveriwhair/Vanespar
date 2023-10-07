@@ -4,6 +4,8 @@ import 'package:vanespar/screens/new_habit_screen.dart';
 import 'package:vanespar/screens/parameters_screen.dart';
 import 'package:vanespar/screens/stats_screen.dart';
 
+import 'dart:ui';
+
 import '../main.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -148,6 +150,26 @@ class CustomHeader extends StatelessWidget {
 class MyListWidget extends StatelessWidget {
   const MyListWidget({super.key});
 
+  Widget scaleUpDecorator(Widget child, int index, Animation<double> animation) {
+    return AnimatedBuilder(
+      animation: animation,
+      builder: (BuildContext context, Widget? child) {
+        final double animValue = Curves.easeInOut.transform(animation.value);
+        final double elevation = lerpDouble(1, 6, animValue)!;
+        final double scale = lerpDouble(1, 1.05, animValue)!;
+        return Transform.scale(
+          scale: scale,
+          child: Card(
+            margin: EdgeInsets.zero,
+            elevation: elevation,
+            child: child,
+          ),
+        );
+      },
+      child: child,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
 
@@ -196,7 +218,11 @@ class MyListWidget extends StatelessWidget {
 
     return Container(
         color: Colors.black,
-        child: ListView(children: items)
+        child: ReorderableListView(
+          onReorder: (oldIndex, newIndex) => habitManager.reorderHabit(oldIndex, newIndex),
+          proxyDecorator: scaleUpDecorator,
+          children: items,
+        )
     );
   }
 }

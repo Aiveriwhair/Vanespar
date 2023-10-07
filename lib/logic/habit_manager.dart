@@ -36,4 +36,8 @@ class HabitManager {
   List<Habit> getHabits() {
     return habits;
   }
+
+  void reorderHabit(int oldIndex, int newIndex) {
+
+  }
 }
