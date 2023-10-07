@@ -150,35 +150,42 @@ class MyListWidget extends StatelessWidget {
   }
 }
 
-class CustomListItem extends StatelessWidget {
-  final Color color;
-  final String title;
-  final String description;
-  final bool isCompleted;
-  final IconData iconData;
+class CustomListItem extends StatefulWidget {
+  Color color;
+  String title;
+  String description;
+  bool isCompleted;
+  IconData iconData;
   List<bool> lastDaysCompletion;
 
   CustomListItem({
-    Key? key,
+    super.key,
     required this.title,
     required this.description,
     required this.isCompleted,
     required this.iconData,
     required List<bool> lastDaysCompletion,
     required this.color,
-  }) : lastDaysCompletion = [...lastDaysCompletion, isCompleted],
-        super(key: key);
+  }) : lastDaysCompletion = [...lastDaysCompletion, isCompleted];
 
-  void onItemTap() {}
-  void onCompleteButtonPress() {}
+  @override
+  State<CustomListItem> createState() => _CustomListItemState();
+}
+
+class _CustomListItemState extends State<CustomListItem> {
+
+  void onItemTap(){}
+
+  void onCompleteButtonPress(){
+    setState(() {
+      widget.isCompleted = !widget.isCompleted;
+      widget.lastDaysCompletion.removeLast();
+      widget.lastDaysCompletion.add(widget.isCompleted);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-
-    double iconSize = 34;
-
-    Color backGroundColor = HexColor.fromHex("#151515");
-    Color unselectedColor = HexColor.fromHex("#353535");
 
     return Container(
         color: Colors.black,
@@ -198,22 +205,22 @@ class CustomListItem extends StatelessWidget {
                         Container(
                             decoration: BoxDecoration(
                               borderRadius:
-                                  const BorderRadius.all(Radius.circular(10)),
-                              color: color,
+                              const BorderRadius.all(Radius.circular(10)),
+                              color: widget.color,
                             ),
                             width: iconSize,
                             height: iconSize,
                             child: Icon(
-                              iconData,
+                              widget.iconData,
                               color: Colors.white,
                             )),
                         const SizedBox(width: 5),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(title,
+                            Text(widget.title,
                                 style: const TextStyle(color: Colors.white)),
-                            Text(description,
+                            Text(widget.description,
                                 style: const TextStyle(color: Colors.white))
                           ],
                         ),
@@ -222,8 +229,8 @@ class CustomListItem extends StatelessWidget {
                     Container(
                         decoration: BoxDecoration(
                           borderRadius:
-                              const BorderRadius.all(Radius.circular(10)),
-                          color: color,
+                          const BorderRadius.all(Radius.circular(10)),
+                          color: (widget.isCompleted ? widget.color : unselectedColor),
                         ),
                         width: iconSize,
                         height: iconSize,
@@ -241,26 +248,37 @@ class CustomListItem extends StatelessWidget {
                     height: 20,
                     padding: const EdgeInsets.all(5.0),
                     child: ListView.builder(
-                        itemCount: lastDaysCompletion.length,
-                        scrollDirection: Axis.horizontal,
-                        itemBuilder: (context, index) {
-                          Color squareColor = lastDaysCompletion[index]
-                              ? color
-                              : unselectedColor;
-                          return Container(
-                            width: 10,
-                            height: 10,
-                            margin: const EdgeInsets.fromLTRB(5,0,5,0),
-                            decoration: BoxDecoration(
-                              borderRadius:
-                              const BorderRadius.all(Radius.circular(3)),
-                              color: squareColor,
-                            ),
-                          );
-                        },
+                      itemCount: widget.lastDaysCompletion.length,
+                      scrollDirection: Axis.horizontal,
+                      itemBuilder: (context, index) {
+                        Color squareColor = widget.lastDaysCompletion[index]
+                            ? widget.color
+                            : unselectedColor;
+                        return Container(
+                          width: 10,
+                          height: 10,
+                          margin: const EdgeInsets.fromLTRB(5,0,5,0),
+                          decoration: BoxDecoration(
+                            borderRadius:
+                            const BorderRadius.all(Radius.circular(3)),
+                            color: squareColor,
+                          ),
+                        );
+                      },
                     )
                 )
               ],
             )));
   }
+
+  // Colors
+  final Color backGroundColor = HexColor.fromHex("#151515");
+  final Color unselectedColor = HexColor.fromHex("#353535");
+
+  // Sizes
+  final double iconSize = 34;
+
+  // Fonts
+  final double titleSize = 24;
+  final double descriptionSize = 24;
 }
