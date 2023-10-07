@@ -42,6 +42,11 @@ class HabitManager {
   }
 
   void reorderHabit(int oldIndex, int newIndex) {
-
+    if (newIndex > oldIndex) {
+      newIndex -= 1;
+    }
+    Habit habit = habits.removeAt(oldIndex);
+    habits.insert(newIndex, habit);
+    _saveHabitsToPrefs();
   }
 }
