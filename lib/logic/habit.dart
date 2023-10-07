@@ -70,7 +70,7 @@ class Habit {
 
     return Habit(
       id: json['id'],
-      title: json['title'],
+      title: json['name'],
       description: json['description'],
       color: json['color'],
       iconCodePoint: json['iconCodePoint'],

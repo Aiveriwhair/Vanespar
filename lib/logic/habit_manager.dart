@@ -16,9 +16,8 @@ class HabitManager {
   }
 
   void _loadHabitsFromPrefs() {
-    String habitsJson = _prefs.getString('habits') ?? '[]';
-    List<Map<String, dynamic>> habitsData =
-        List<Map<String, dynamic>>.from(json.decode(habitsJson));
+    List<String> habitsJson = _prefs.getStringList('habits') ?? [];
+    List<Map<String, dynamic>> habitsData = List<Map<String, dynamic>>.from(habitsJson.map((habit) => json.decode(habit)).toList());
     habits = habitsData.map((habitData) => Habit.fromJson(habitData)).toList();
   }
 
