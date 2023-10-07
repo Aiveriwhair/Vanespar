@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:vanespar/logic/habit.dart';
 import 'package:vanespar/logic/habit_manager.dart';
 import 'package:vanespar/screens/new_habit_screen.dart';
 import 'package:vanespar/screens/parameters_screen.dart';
@@ -33,19 +34,15 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        children: <Widget>[
-            CustomHeader(
-                onNewHabitPress: () => onNewHabitPress(context),
-                onStatsPress: () => onStatsPress(context),
-                onParameterPress: () => onParameterPress(context),
-
-            ),
-          const Expanded(
-            child: MyListWidget(),
-          ),
-        ],
+      appBar: AppBar(
+        backgroundColor: Colors.black,
+        title: CustomHeader(
+          onNewHabitPress: () => onNewHabitPress(context),
+          onStatsPress: () => onStatsPress(context),
+          onParameterPress: () => onParameterPress(context),
+        ),
       ),
+      body: const MyStatefulListWidget(),
     );
   }
 }
@@ -147,87 +144,8 @@ class CustomHeader extends StatelessWidget {
   }
 }
 
-class MyListWidget extends StatelessWidget {
-  const MyListWidget({super.key});
-
-  Widget scaleUpDecorator(Widget child, int index, Animation<double> animation) {
-    return AnimatedBuilder(
-      animation: animation,
-      builder: (BuildContext context, Widget? child) {
-        final double animValue = Curves.easeInOut.transform(animation.value);
-        final double elevation = lerpDouble(1, 6, animValue)!;
-        final double scale = lerpDouble(1, 1.05, animValue)!;
-        return Transform.scale(
-          scale: scale,
-          child: Card(
-            margin: EdgeInsets.zero,
-            elevation: elevation,
-            child: child,
-          ),
-        );
-      },
-      child: child,
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-
-    HabitManager habitManager = HabitManager();
-
-    List<Widget> items = [];
-    for(var habit in habitManager.getHabits()){
-      items.add(
-        CustomListItem(
-          title: habit.title,
-          description: habit.description,
-          isCompleted: habit.isCompletedToday(),
-          iconData: habit.getIconData(),
-          lastDaysCompletion: habit.getLastDaysCompletion(6),
-          color: HexColor.fromHex(habit.color),
-        )
-      );
-    }
-/*
-    List<Widget> items = [
-      CustomListItem(
-        title: "Title",
-        description: "Description",
-        isCompleted: true,
-        iconData: Icons.house,
-        lastDaysCompletion: const [true, false, true, false, true, false],
-        color: Colors.orange,
-      ),
-      CustomListItem(
-        title: "Title",
-        description: "Description",
-        isCompleted: false,
-        iconData: Icons.shower,
-        lastDaysCompletion: const [true, false, false, false, true, true],
-        color: Colors.blue,
-      ),
-      CustomListItem(
-        title: "Title",
-        description: "Description",
-        isCompleted: true,
-        iconData: Icons.bed,
-        lastDaysCompletion: const [true, true, true, true, true, false],
-        color: Colors.red,
-      ),
-    ];*/
-
-    return Container(
-        color: Colors.black,
-        child: ReorderableListView(
-          onReorder: (oldIndex, newIndex) => habitManager.reorderHabit(oldIndex, newIndex),
-          proxyDecorator: scaleUpDecorator,
-          children: items,
-        )
-    );
-  }
-}
-
 class CustomListItem extends StatefulWidget {
+  String id;
   Color color;
   String title;
   String description;
@@ -237,6 +155,7 @@ class CustomListItem extends StatefulWidget {
 
   CustomListItem({
     super.key,
+    required this.id,
     required this.title,
     required this.description,
     required this.isCompleted,
@@ -258,6 +177,7 @@ class _CustomListItemState extends State<CustomListItem> {
       widget.isCompleted = !widget.isCompleted;
       widget.lastDaysCompletion.removeLast();
       widget.lastDaysCompletion.add(widget.isCompleted);
+      HabitManager.setHabitLastDayCompletion(widget.id, widget.isCompleted);
     });
   }
 
@@ -364,4 +284,78 @@ class _CustomListItemState extends State<CustomListItem> {
   // Fonts
   final double titleSize = 24;
   final double descriptionSize = 24;
+}
+
+class MyStatefulListWidget extends StatefulWidget {
+  const MyStatefulListWidget({ super.key });
+
+  Widget scaleUpDecorator(Widget child, int index, Animation<double> animation) {
+    return AnimatedBuilder(
+      animation: animation,
+      builder: (BuildContext context, Widget? child) {
+        final double animValue = Curves.easeInOut.transform(animation.value);
+        final double elevation = lerpDouble(1, 6, animValue)!;
+        final double scale = lerpDouble(1, 1.05, animValue)!;
+        return Transform.scale(
+          scale: scale,
+          child: Card(
+            margin: EdgeInsets.zero,
+            elevation: elevation,
+            child: child,
+          ),
+        );
+      },
+      child: child,
+    );
+  }
+
+  @override
+  State<MyStatefulListWidget> createState() => _MyStatefulListWidgetState();
+}
+
+class _MyStatefulListWidgetState extends State<MyStatefulListWidget> {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: Colors.black,
+      child: Column(children: [
+        Expanded(
+          child: StreamBuilder<List<Habit>>(
+            stream: HabitManager.habitsStream, // Stream of habits
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                // ReorderableListView with CustomListItem widgets
+                return ReorderableListView(
+                  onReorder: (oldIndex, newIndex) => HabitManager.reorderHabit(oldIndex, newIndex),
+                  proxyDecorator: widget.scaleUpDecorator,
+                  children: snapshot.data!.map((habit) => CustomListItem(
+                    id: habit.id,
+                    title: habit.title,
+                    description: habit.description,
+                    isCompleted: habit.isCompletedToday(),
+                    iconData: habit.getIconData(),
+                    lastDaysCompletion: habit.getLastDaysCompletion(6),
+                    color: HexColor.fromHex(habit.color),
+                    key: ValueKey<String>(habit.id),
+                  )).toList(),
+                );
+              } else if (snapshot.hasError) {
+                // Handle error
+                return Text('Error: ${snapshot.error}');
+              } else {
+                // Show loading indicator
+                return const Center(child: CircularProgressIndicator());
+              }
+            },
+          )
+        ),
+        IconButton(onPressed: addHabit, icon: Icon(Icons.add, color: Colors.white, size: 50))
+      ])
+    );
+  }
+
+  void addHabit() {
+    HabitManager.addHabit(Habit(title: "Title2", color: Colors.orange.toHex(), iconCodePoint: Icons.house.codePoint));
+  }
+  
 }
