@@ -17,8 +17,9 @@ class Habit {
     required this.color,
     required this.iconCodePoint,
     this.description = "",
-    this.completionDates = const [],
-  }) : id = id ?? generateUniqueId();
+    List<DateTime>? completionDates,
+  }) : id = id ?? generateUniqueId(),
+        completionDates = completionDates ?? [];
 
   bool isCompletedToday(){
     DateTime today = DateTime.now();
