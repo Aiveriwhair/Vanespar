@@ -5,7 +5,9 @@ class ModifyHabitScreen extends StatelessWidget{
 
   @override
   Widget build(BuildContext context) {
-    throw UnimplementedError();
+    return(
+        const Text('Modify Habit Screen : Not implemented Yet')
+    );
   }
 
 }

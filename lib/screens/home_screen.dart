@@ -1,18 +1,45 @@
 import 'package:flutter/material.dart';
 import 'package:vanespar/logic/habit_manager.dart';
+import 'package:vanespar/screens/new_habit_screen.dart';
+import 'package:vanespar/screens/parameters_screen.dart';
+import 'package:vanespar/screens/stats_screen.dart';
 
 import '../main.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
+  void onNewHabitPress(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const NewHabitScreen()),
+    );
+  }
+  void onStatsPress(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const StatsScreen()),
+    );
+  }
+  void onParameterPress(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const ParametersScreen()),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    return Scaffold(
       body: Column(
         children: <Widget>[
-          CustomHeader(),
-          Expanded(
+            CustomHeader(
+                onNewHabitPress: () => onNewHabitPress(context),
+                onStatsPress: () => onStatsPress(context),
+                onParameterPress: () => onParameterPress(context),
+
+            ),
+          const Expanded(
             child: MyListWidget(),
           ),
         ],
@@ -22,11 +49,16 @@ class HomeScreen extends StatelessWidget {
 }
 
 class CustomHeader extends StatelessWidget {
-  const CustomHeader({super.key});
+  final VoidCallback onNewHabitPress;
+  final VoidCallback onStatsPress;
+  final VoidCallback onParameterPress;
 
-  void onParameterPress() {}
-  void onStatsPress() {}
-  void onNewHabitPress() {}
+  const CustomHeader({
+    super.key,
+    required this.onNewHabitPress,
+    required this.onStatsPress,
+    required this.onParameterPress
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -238,9 +270,15 @@ class _CustomListItemState extends State<CustomListItem> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(widget.title,
-                                style: const TextStyle(color: Colors.white)),
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: titleSize
+                                )),
                             Text(widget.description,
-                                style: const TextStyle(color: Colors.white))
+                                style: TextStyle(
+                                    color: Colors.white,
+                                  fontSize: descriptionSize
+                                ))
                           ],
                         ),
                       ],

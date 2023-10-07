@@ -5,7 +5,9 @@ class StatsScreen extends StatelessWidget{
 
   @override
   Widget build(BuildContext context) {
-    throw UnimplementedError();
+    return(
+        const Text('Stats Screen : Not implemented Yet')
+    );
   }
 
 }
