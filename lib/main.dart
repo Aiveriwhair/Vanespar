@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:vanespar/screens/home_screen.dart';
 
-void main() => runApp(MyApp());
+void main() => runApp(SafeArea(child: MyApp()));
 
 class MyApp extends StatelessWidget {
   @override
