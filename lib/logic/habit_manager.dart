@@ -6,7 +6,6 @@ class HabitManager {
   static List<Habit> habits = [];
   late SharedPreferences _prefs;
 
-
   HabitManager(){
     _initSharedPreferences();
   }

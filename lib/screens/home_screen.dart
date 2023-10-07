@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:vanespar/logic/habit_manager.dart';
 
 import '../main.dart';
 
@@ -117,6 +118,23 @@ class MyListWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    HabitManager habitManager = HabitManager();
+
+    List<Widget> items = [];
+    for(var habit in habitManager.getHabits()){
+      items.add(
+        CustomListItem(
+          title: habit.title,
+          description: habit.description,
+          isCompleted: habit.isCompletedToday(),
+          iconData: habit.getIconData(),
+          lastDaysCompletion: habit.getLastDaysCompletion(6),
+          color: HexColor.fromHex(habit.color),
+        )
+      );
+    }
+/*
     List<Widget> items = [
       CustomListItem(
         title: "Title",
@@ -142,10 +160,11 @@ class MyListWidget extends StatelessWidget {
         lastDaysCompletion: const [true, true, true, true, true, false],
         color: Colors.red,
       ),
-    ];
+    ];*/
 
     return Container(
-      color: Colors.black, child: ListView(children: items)
+        color: Colors.black,
+        child: ListView(children: items)
     );
   }
 }

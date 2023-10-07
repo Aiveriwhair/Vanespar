@@ -1,21 +1,51 @@
 import 'dart:math';
 
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+
 class Habit {
   String id;
-  String name;
+  String title;
   String description;
   String color;
   List<DateTime> completionDates;
-  String icon;
+  int iconCodePoint;
 
   Habit({
     String? id,
-    required this.name,
+    required this.title,
     required this.color,
-    required this.icon,
+    required this.iconCodePoint,
     this.description = "",
     this.completionDates = const [],
   }) : id = id ?? generateUniqueId();
+
+  bool isCompletedToday(){
+    DateTime today = DateTime.now();
+    return completionDates.any((date) => date.year == today.year && date.month == today.month && date.day == today.day);
+  }
+
+  IconData getIconData(){
+    return IconData(iconCodePoint, fontFamily: "MaterialICons");
+  }
+
+  List<bool> getLastDaysCompletion(int numDays){
+    DateTime today = DateTime.now();
+    DateTime lastDaysStart = today.subtract(Duration(days: numDays));
+
+    List<bool> completions = [];
+
+    for (int i = 0; i < numDays; i++) {
+      DateTime currentDate = lastDaysStart.add(Duration(days: i));
+      bool isCompletedOnDate = completionDates.any((date) =>
+      date.year == currentDate.year &&
+          date.month == currentDate.month &&
+          date.day == currentDate.day);
+      completions.add(isCompletedOnDate);
+    }
+
+    return completions;
+  }
 
   static String generateUniqueId() {
     Random random = Random();
@@ -27,10 +57,10 @@ class Habit {
   Map<String, dynamic> toJson() {
     return {
       'id' : id,
-      'name': name,
+      'name': title,
       'description': description,
       'color': color,
-      'icon': icon,
+      'iconCodePoint': iconCodePoint,
       'completionDates': completionDates.map((date) => date.toIso8601String()).toList(),
     };
   }
@@ -40,10 +70,10 @@ class Habit {
 
     return Habit(
       id: json['id'],
-      name: json['name'],
+      title: json['title'],
       description: json['description'],
       color: json['color'],
-      icon: json['icon'],
+      iconCodePoint: json['iconCodePoint'],
       completionDates: completionDatesList,
     );
   }
