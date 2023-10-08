@@ -11,12 +11,14 @@ import '../main.dart';
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
-  void onNewHabitPress(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const NewHabitScreen()),
-    );
-  }
+    void onNewHabitPress(BuildContext context) {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => const NewHabitScreen(),
+        ),
+      );
+    }
+
   void onStatsPress(BuildContext context) {
     Navigator.push(
       context,
@@ -184,7 +186,7 @@ class MyListWidget extends StatelessWidget {
           isCompleted: habit.isCompletedToday(),
           iconData: habit.getIconData(),
           lastDaysCompletion: habit.getLastDaysCompletion(6),
-          color: HexColor.fromHex(habit.color),
+          color: Color(habit.color),
         )
       );
     }

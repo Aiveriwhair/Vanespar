@@ -1,13 +1,364 @@
 import 'package:flutter/material.dart';
+import 'package:vanespar/logic/habit.dart';
+import 'package:vanespar/logic/habit_manager.dart';
 
-class NewHabitScreen extends StatelessWidget{
-  const NewHabitScreen({super.key});
+import '../main.dart';
 
+final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+final TextEditingController _titleController = TextEditingController();
+final TextEditingController _descriptionController = TextEditingController();
+String _selectedFrequency = 'None';
+int _selectedColor = 0;
+int _selectedIcon = 0;
+
+class NewHabitScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return(
-    const Text('New Habit Screen : Not implemented Yet')
+    return Scaffold(
+      appBar: AppBar(
+        title: const Header(),
+        backgroundColor: Colors.black,
+      ),
+      body: Form(
+        key: _formKey,
+        child: Container(
+            width: MediaQuery.of(context).size.width,
+            padding: const EdgeInsets.all(30.0),
+            color: Colors.black,
+            child: Column(
+              children: <Widget>[
+                InputWidget(
+                  controller: _titleController,
+                  name: 'Title',
+                ),
+                InputWidget(
+                  controller: _descriptionController,
+                  name: 'Description',
+                ),
+                const Align(
+                  alignment: Alignment.centerLeft,
+                  child: DropDownButton(),
+                ),
+                const Align(
+                  alignment: Alignment.centerLeft,
+                  child: Padding(padding: EdgeInsets.all(5),
+                    child:Text("Icon", style: TextStyle(color: Colors.white))),
+                ),
+                const Expanded(child:IconGrid()),
+                const Align(
+                  alignment: Alignment.centerLeft,
+                  child: Padding(padding: EdgeInsets.all(5),
+                      child:Text("Color", style: TextStyle(color: Colors.white))),
+                ),
+                const Expanded(child: ColorGrid()),
+              ],
+            )),
+      ),
     );
   }
 
+  const NewHabitScreen({super.key});
+}
+
+class Header extends StatelessWidget {
+  void onCompleteButtonPress() {
+    if (_formKey.currentState!.validate()) {
+      String title = _titleController.text;
+      String description = _descriptionController.text;
+      String frequency = _selectedFrequency;
+      int iconPoint = _selectedIcon;
+      int colorValue = _selectedColor;
+
+      // Create new Habit
+      var newHabit = Habit(title: title, description: description, color: colorValue, iconCodePoint: iconPoint);
+      // Add habit to SharedPreferences using HabitManager
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+        height: 60,
+        color: Colors.black,
+        child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Text(
+                    'New ',
+                    textAlign: TextAlign.center,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                        color: HexColor.fromHex("#DC8BFC"),
+                        fontSize: 29,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 1.2),
+                  ),
+                  Text(
+                    'Habit',
+                    textAlign: TextAlign.center,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                        color: HexColor.fromHex("#84D4FF"),
+                        fontSize: 29,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 1.2),
+                  ),
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: <Widget>[
+                  IconButton(
+                    icon: Icon(Icons.check_circle_outline_rounded,
+                        color: Colors.white, size: iconSize),
+                    onPressed: onCompleteButtonPress,
+                  ),
+                  const SizedBox(width: 10),
+                ],
+              ),
+            ]));
+  }
+
+  const Header({super.key});
+  final double iconSize = 30.0;
+}
+
+/*
+class HabitCreationWidget extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+        width: MediaQuery.of(context).size.width,
+        padding: const EdgeInsets.all(30.0),
+        color: Colors.black,
+        child: Container(
+            color: Colors.black,
+            child: Column(children: <Widget>[
+              InputWidget(name: 'Title'),
+              InputWidget(name: 'Description'),
+              const Align(
+                  alignment: Alignment.centerLeft, child: DropDownButton()),
+            ])));
+  }
+
+  const HabitCreationWidget({super.key});
+}*/
+
+class InputWidget extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 4),
+          child: TextFormField(
+            focusNode: focusNode,
+            cursorColor: Colors.white,
+            style: TextStyle(color: Colors.white, fontSize: inputLabelSize),
+            decoration: InputDecoration(
+              labelText: name,
+              labelStyle: TextStyle(
+                color: Colors.white,
+                fontSize: inputLabelSize,
+              ),
+              enabledBorder: const UnderlineInputBorder(
+                borderSide: BorderSide(color: Colors.white),
+              ),
+              focusedBorder: const UnderlineInputBorder(
+                borderSide: BorderSide(color: Colors.white),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  InputWidget({super.key, required this.name, required this.controller});
+
+  FocusNode focusNode = FocusNode();
+  final TextEditingController controller;
+  final String name;
+
+  // Colors
+  final Color nameColor = Colors.white;
+  final Color inputColor = HexColor.fromHex("#353535");
+
+  // Sizes
+  final double inputLabelSize = 20;
+  final double inputTextSize = 16;
+  final double colorsSpacing = 5;
+  final double iconsSpacing = 5;
+}
+
+class DropDownButton extends StatefulWidget {
+  const DropDownButton({super.key});
+  @override
+  State<StatefulWidget> createState() => DropDownButtonState();
+}
+
+class DropDownButtonState extends State<DropDownButton> {
+  var dropdownValue = 'None';
+  List<String> frequencyList = <String>[
+    'None',
+    'Daily',
+    'Weekly',
+    'Monthly',
+    'Yearly'
+  ];
+
+  void onChanged(String? value) {
+    setState(() {
+      dropdownValue = value!;
+      _selectedFrequency = value;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 8),
+        child: DropdownButton<String>(
+          value: dropdownValue,
+          style: TextStyle(color: Colors.black, fontSize: labelSize),
+          dropdownColor: Colors.black,
+          icon: const Icon(Icons.arrow_drop_down, color: Colors.white),
+          underline: Container(
+            height: 2,
+            color: Colors.white,
+          ),
+          onChanged: (value) => onChanged(value),
+          items: frequencyList.map<DropdownMenuItem<String>>((String value) {
+            return DropdownMenuItem<String>(
+              value: value,
+              child: Text(
+                value,
+                style: const TextStyle(color: Colors.white),
+              ),
+            );
+          }).toList(),
+        ));
+  }
+
+  final double labelSize = 16;
+}
+
+class IconGrid extends StatefulWidget {
+  const IconGrid({super.key});
+  @override
+  State<StatefulWidget> createState() => _IconGridState();
+}
+
+class _IconGridState extends State<IconGrid> {
+  int selectedIndex = 0;
+  List<IconData> icons = [
+    Icons.abc,
+    Icons.abc,
+    Icons.abc,
+    Icons.abc,
+    Icons.abc,
+    Icons.abc,
+    Icons.abc,
+    Icons.abc,
+    Icons.abc,
+    Icons.abc,
+    Icons.abc,
+    Icons.abc,
+    Icons.abc,
+    Icons.abc,
+    Icons.abc,
+    Icons.abc,
+    Icons.abc,
+    Icons.abc,
+    Icons.abc,
+    Icons.abc,
+    Icons.abc,
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return GridView.builder(
+        itemCount: icons.length,
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 7),
+        itemBuilder: (context, index) {
+          return Container(
+            decoration: BoxDecoration(
+                border: Border.all(width:2,color:  (selectedIndex == index ? Colors.white : Colors.black)),
+                borderRadius: BorderRadius.circular(20)),
+              child: GestureDetector(
+                onTap: () {
+                  setState(() {
+                    selectedIndex = index;
+                  });
+                  _selectedIcon = icons[index].codePoint;
+                },
+                  child: Icon(icons[index], color: Colors.white,size: 30))
+              );
+        }
+    );
+  }
+}
+
+class ColorGrid extends StatefulWidget {
+  const ColorGrid({super.key});
+
+  @override
+  State<StatefulWidget> createState() => _ColorGridState();
+}
+
+class _ColorGridState extends State<ColorGrid> {
+  int selectedIcon = -1;
+
+  int selectedIndex = 0;
+  List<String> colorsHexs = [
+    "#FDF1D0",
+    "#D3D5AE",
+    "#A6BA92",
+    "#76A07B",
+    "#43866A",
+    "#006C5E",
+    "#BFDFCE",
+    "#9AC0B7",
+    "#79A1A0",
+    "#5D8289",
+    "#446571",
+    "#2F4858",
+    "#CCDAF5",
+    "#B9BDDF",
+    "#ABA1C6",
+    "#9E84AA",
+    "#92688C",
+    "#854C6B",
+    "#FFCCB2",
+    "#FFDE87",
+    "#F9F871"
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return GridView.builder(
+        itemCount: colorsHexs.length,
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 7),
+        itemBuilder: (context, index) {
+          return Container(
+            width: 20,
+            height: 20,
+              decoration: BoxDecoration(
+                  color: HexColor.fromHex(colorsHexs[index]),
+                  border: Border.all(width:2,color:  (selectedIndex == index ? Colors.white : Colors.black)),
+                  borderRadius: BorderRadius.circular(20)),
+              child: GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      selectedIndex = index;
+                    });
+                    _selectedColor = HexColor.fromHex(colorsHexs[index]).value;
+                  },
+          ));
+        }
+    );
+  }
 }

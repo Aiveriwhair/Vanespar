@@ -7,7 +7,7 @@ class Habit {
   String id;
   String title;
   String description;
-  String color;
+  int color;
   List<DateTime> completionDates;
   int iconCodePoint;
 
