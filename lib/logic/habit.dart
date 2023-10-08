@@ -7,6 +7,7 @@ class Habit {
   String id;
   String title;
   String description;
+  String frequency;
   int color;
   List<DateTime> completionDates;
   int iconCodePoint;
@@ -16,6 +17,7 @@ class Habit {
     required this.title,
     required this.color,
     required this.iconCodePoint,
+    this.frequency = "Daily",
     this.description = "",
     List<DateTime>? completionDates,
   }) : id = id ?? generateUniqueId(),

@@ -9,7 +9,6 @@ import 'dart:ui';
 
 import '../main.dart';
 
-
 void onNewHabitPress(BuildContext context) {
   Navigator.of(context).push(
     MaterialPageRoute(
@@ -24,6 +23,7 @@ void onStatsPress(BuildContext context) {
     MaterialPageRoute(builder: (context) => const StatsScreen()),
   );
 }
+
 void onParameterPress(BuildContext context) {
   Navigator.push(
     context,
@@ -54,12 +54,11 @@ class CustomHeader extends StatelessWidget {
   final VoidCallback onStatsPress;
   final VoidCallback onParameterPress;
 
-  const CustomHeader({
-    super.key,
-    required this.onNewHabitPress,
-    required this.onStatsPress,
-    required this.onParameterPress
-  });
+  const CustomHeader(
+      {super.key,
+      required this.onNewHabitPress,
+      required this.onStatsPress,
+      required this.onParameterPress});
 
   @override
   Widget build(BuildContext context) {
@@ -149,7 +148,8 @@ class CustomHeader extends StatelessWidget {
 class MyListWidget extends StatelessWidget {
   const MyListWidget({super.key});
 
-  Widget scaleUpDecorator(Widget child, int index, Animation<double> animation) {
+  Widget scaleUpDecorator(
+      Widget child, int index, Animation<double> animation) {
     return AnimatedBuilder(
       animation: animation,
       builder: (BuildContext context, Widget? child) {
@@ -171,22 +171,20 @@ class MyListWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     HabitManager habitManager = HabitManager();
 
     List<Widget> items = [];
-    for(var habit in habitManager.getHabits()){
-      items.add(
-        CustomListItem(
-          id: habit.id,
-          title: habit.title,
-          description: habit.description,
-          isCompleted: habit.isCompletedToday(),
-          iconData: habit.getIconData(),
-          lastDaysCompletion: habit.getLastDaysCompletion(6),
-          color: Color(habit.color),
-        )
-      );
+    for (var habit in habitManager.getHabits()) {
+      items.add(CustomListItem(
+        id: habit.id,
+        title: habit.title,
+        description: habit.description,
+        isCompleted: habit.isCompletedToday(),
+        iconData: habit.getIconData(),
+        frequency: habit.frequency,
+        lastDaysCompletion: habit.getLastDaysCompletion(6),
+        color: Color(habit.color),
+      ));
     }
 /*
     List<Widget> items = [
@@ -219,11 +217,11 @@ class MyListWidget extends StatelessWidget {
     return Container(
         color: Colors.black,
         child: ReorderableListView(
-          onReorder: (oldIndex, newIndex) => HabitManager.reorderHabit(oldIndex, newIndex),
+          onReorder: (oldIndex, newIndex) =>
+              HabitManager.reorderHabit(oldIndex, newIndex),
           proxyDecorator: scaleUpDecorator,
           children: items,
-        )
-    );
+        ));
   }
 }
 
@@ -233,6 +231,7 @@ class CustomListItem extends StatefulWidget {
   String title;
   String description;
   bool isCompleted;
+  String frequency;
   IconData iconData;
   List<bool> lastDaysCompletion;
 
@@ -243,6 +242,7 @@ class CustomListItem extends StatefulWidget {
     required this.description,
     required this.isCompleted,
     required this.iconData,
+    required this.frequency,
     required List<bool> lastDaysCompletion,
     required this.color,
   }) : lastDaysCompletion = [...lastDaysCompletion, isCompleted];
@@ -252,10 +252,9 @@ class CustomListItem extends StatefulWidget {
 }
 
 class _CustomListItemState extends State<CustomListItem> {
+  void onItemTap() {}
 
-  void onItemTap(){}
-
-  void onCompleteButtonPress(){
+  void onCompleteButtonPress() {
     setState(() {
       widget.isCompleted = !widget.isCompleted;
       widget.lastDaysCompletion.removeLast();
@@ -266,95 +265,91 @@ class _CustomListItemState extends State<CustomListItem> {
 
   @override
   Widget build(BuildContext context) {
-
     return Container(
         color: Colors.black,
-        padding: const EdgeInsets.fromLTRB(10, 2, 10, 2),
+        padding: const EdgeInsets.fromLTRB(10, 4, 10, 4),
         child: Container(
             padding: const EdgeInsets.all(10.0),
             decoration: BoxDecoration(
                 borderRadius: const BorderRadius.all(Radius.circular(15)),
                 color: backGroundColor),
-            child: Column(
-              children: <Widget>[
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        Container(
-                            decoration: BoxDecoration(
-                              borderRadius:
-                              const BorderRadius.all(Radius.circular(10)),
-                              color: widget.color,
-                            ),
-                            width: iconSize,
-                            height: iconSize,
-                            child: Icon(
-                              widget.iconData,
-                              color: Colors.white,
-                            )),
-                        const SizedBox(width: 5),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(widget.title,
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: titleSize
-                                )),
-                            Text(widget.description,
-                                style: TextStyle(
-                                    color: Colors.white,
-                                  fontSize: descriptionSize
-                                ))
-                          ],
-                        ),
-                      ],
-                    ),
-                    Container(
-                        decoration: BoxDecoration(
-                          borderRadius:
-                          const BorderRadius.all(Radius.circular(10)),
-                          color: (widget.isCompleted ? widget.color : unselectedColor),
-                        ),
-                        width: iconSize,
-                        height: iconSize,
-                        child: IconButton(
-                          padding: EdgeInsets.zero,
-                          iconSize: 25,
-                          icon: const Icon(Icons.check, color: Colors.white),
-                          onPressed: onCompleteButtonPress,
-                          style: const ButtonStyle(),
-                        ))
-                  ],
-                ),
-                Container(
-                    width: 200,
-                    height: 20,
-                    padding: const EdgeInsets.all(5.0),
-                    child: ListView.builder(
-                      itemCount: widget.lastDaysCompletion.length,
-                      scrollDirection: Axis.horizontal,
-                      itemBuilder: (context, index) {
-                        Color squareColor = widget.lastDaysCompletion[index]
-                            ? widget.color
-                            : unselectedColor;
-                        return Container(
-                          width: 10,
-                          height: 10,
-                          margin: const EdgeInsets.fromLTRB(5,0,5,0),
+            child: Column(children: <Widget>[
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      Container(
                           decoration: BoxDecoration(
                             borderRadius:
-                            const BorderRadius.all(Radius.circular(3)),
-                            color: squareColor,
+                                const BorderRadius.all(Radius.circular(10)),
+                            color: widget.color,
                           ),
-                        );
-                      },
-                    )
-                )
-              ],
-            )));
+                          width: iconSize,
+                          height: iconSize,
+                          child: Icon(
+                            widget.iconData,
+                            color: Colors.white,
+                          )),
+                      const SizedBox(width: 5),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(widget.title,
+                              style: TextStyle(
+                                  color: Colors.white, fontSize: titleSize)),
+                          Text(widget.description,
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: descriptionSize))
+                        ],
+                      ),
+                    ],
+                  ),
+                  Container(
+                      decoration: BoxDecoration(
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(10)),
+                        color: (widget.isCompleted
+                            ? widget.color
+                            : unselectedColor),
+                      ),
+                      width: iconSize,
+                      height: iconSize,
+                      child: IconButton(
+                        padding: EdgeInsets.zero,
+                        iconSize: 25,
+                        icon: const Icon(Icons.check, color: Colors.white),
+                        onPressed: onCompleteButtonPress,
+                        style: const ButtonStyle(),
+                      ))
+                ],
+              ),
+              Container(
+                width: 250,
+                height: 20,
+                padding: const EdgeInsets.all(5.0),
+                child: ListView.builder(
+                  itemCount: widget.lastDaysCompletion.length,
+                  scrollDirection: Axis.horizontal,
+                  itemBuilder: (context, index) {
+                    Color squareColor = widget.lastDaysCompletion[index]
+                        ? widget.color
+                        : unselectedColor;
+                    return Container(
+                      width: 10,
+                      height: 10,
+                      margin: const EdgeInsets.fromLTRB(5, 0, 5, 0),
+                      decoration: BoxDecoration(
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(3)),
+                        color: squareColor,
+                      ),
+                    );
+                  },
+                ),
+              )
+            ])));
   }
 
   // Colors
@@ -362,7 +357,7 @@ class _CustomListItemState extends State<CustomListItem> {
   final Color unselectedColor = HexColor.fromHex("#353535");
 
   // Sizes
-  final double iconSize = 34;
+  final double iconSize = 40;
 
   // Fonts
   final double titleSize = 24;
@@ -370,9 +365,10 @@ class _CustomListItemState extends State<CustomListItem> {
 }
 
 class MyStatefulListWidget extends StatefulWidget {
-  const MyStatefulListWidget({ super.key });
+  const MyStatefulListWidget({super.key});
 
-  Widget scaleUpDecorator(Widget child, int index, Animation<double> animation) {
+  Widget scaleUpDecorator(
+      Widget child, int index, Animation<double> animation) {
     return AnimatedBuilder(
       animation: animation,
       builder: (BuildContext context, Widget? child) {
@@ -400,27 +396,31 @@ class _MyStatefulListWidgetState extends State<MyStatefulListWidget> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.black,
-      child: Column(children: [
-        Expanded(
-          child: StreamBuilder<List<Habit>>(
+        color: Colors.black,
+        child: Column(children: [
+          Expanded(
+              child: StreamBuilder<List<Habit>>(
             stream: HabitManager.habitsStream, // Stream of habits
             builder: (context, snapshot) {
               if (snapshot.hasData) {
                 // ReorderableListView with CustomListItem widgets
                 return ReorderableListView(
-                  onReorder: (oldIndex, newIndex) => HabitManager.reorderHabit(oldIndex, newIndex),
+                  onReorder: (oldIndex, newIndex) =>
+                      HabitManager.reorderHabit(oldIndex, newIndex),
                   proxyDecorator: widget.scaleUpDecorator,
-                  children: snapshot.data!.map((habit) => CustomListItem(
-                    id: habit.id,
-                    title: habit.title,
-                    description: habit.description,
-                    isCompleted: habit.isCompletedToday(),
-                    iconData: habit.getIconData(),
-                    lastDaysCompletion: habit.getLastDaysCompletion(6),
-                    color: Color(habit.color),
-                    key: ValueKey<String>(habit.id),
-                  )).toList(),
+                  children: snapshot.data!
+                      .map((habit) => CustomListItem(
+                            id: habit.id,
+                            title: habit.title,
+                            description: habit.description,
+                            isCompleted: habit.isCompletedToday(),
+                            iconData: habit.getIconData(),
+                            lastDaysCompletion: habit.getLastDaysCompletion(6),
+                            color: Color(habit.color),
+                            frequency: habit.frequency,
+                            key: ValueKey<String>(habit.id),
+                          ))
+                      .toList(),
                 );
               } else if (snapshot.hasError) {
                 // Handle error
@@ -430,15 +430,17 @@ class _MyStatefulListWidgetState extends State<MyStatefulListWidget> {
                 return const Center(child: CircularProgressIndicator());
               }
             },
-          )
-        ),
-        IconButton(onPressed: addHabit, icon: const Icon(Icons.add, color: Colors.white, size: 50)),
-      ])
-    );
+          )),
+          IconButton(
+              onPressed: addHabit,
+              icon: const Icon(Icons.add, color: Colors.white, size: 50)),
+        ]));
   }
 
   void addHabit() {
-    HabitManager.addHabit(Habit(title: "Title2", color: Colors.orange.value, iconCodePoint: Icons.house.codePoint));
+    HabitManager.addHabit(Habit(
+        title: "Title2",
+        color: Colors.orange.value,
+        iconCodePoint: Icons.house.codePoint));
   }
-  
 }
