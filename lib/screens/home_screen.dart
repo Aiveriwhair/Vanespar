@@ -9,30 +9,30 @@ import 'dart:ui';
 
 import '../main.dart';
 
+
+void onNewHabitPress(BuildContext context) {
+  Navigator.of(context).push(
+    MaterialPageRoute(
+      builder: (context) => const NewHabitScreen(),
+    ),
+  );
+}
+
+void onStatsPress(BuildContext context) {
+  Navigator.push(
+    context,
+    MaterialPageRoute(builder: (context) => const StatsScreen()),
+  );
+}
+void onParameterPress(BuildContext context) {
+  Navigator.push(
+    context,
+    MaterialPageRoute(builder: (context) => const ParametersScreen()),
+  );
+}
+
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
-
-    void onNewHabitPress(BuildContext context) {
-      Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (context) => const NewHabitScreen(),
-        ),
-      );
-    }
-
-  void onStatsPress(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const StatsScreen()),
-    );
-  }
-  void onParameterPress(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const ParametersScreen()),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -178,6 +178,7 @@ class MyListWidget extends StatelessWidget {
     for(var habit in habitManager.getHabits()){
       items.add(
         CustomListItem(
+          id: habit.id,
           title: habit.title,
           description: habit.description,
           isCompleted: habit.isCompletedToday(),
@@ -218,7 +219,7 @@ class MyListWidget extends StatelessWidget {
     return Container(
         color: Colors.black,
         child: ReorderableListView(
-          onReorder: (oldIndex, newIndex) => habitManager.reorderHabit(oldIndex, newIndex),
+          onReorder: (oldIndex, newIndex) => HabitManager.reorderHabit(oldIndex, newIndex),
           proxyDecorator: scaleUpDecorator,
           children: items,
         )
@@ -365,7 +366,7 @@ class _CustomListItemState extends State<CustomListItem> {
 
   // Fonts
   final double titleSize = 24;
-  final double descriptionSize = 24;
+  final double descriptionSize = 12;
 }
 
 class MyStatefulListWidget extends StatefulWidget {
@@ -417,7 +418,7 @@ class _MyStatefulListWidgetState extends State<MyStatefulListWidget> {
                     isCompleted: habit.isCompletedToday(),
                     iconData: habit.getIconData(),
                     lastDaysCompletion: habit.getLastDaysCompletion(6),
-                    color: HexColor.fromHex(habit.color),
+                    color: Color(habit.color),
                     key: ValueKey<String>(habit.id),
                   )).toList(),
                 );
@@ -431,13 +432,13 @@ class _MyStatefulListWidgetState extends State<MyStatefulListWidget> {
             },
           )
         ),
-        IconButton(onPressed: addHabit, icon: Icon(Icons.add, color: Colors.white, size: 50))
+        IconButton(onPressed: addHabit, icon: const Icon(Icons.add, color: Colors.white, size: 50)),
       ])
     );
   }
 
   void addHabit() {
-    HabitManager.addHabit(Habit(title: "Title2", color: Colors.orange.toHex(), iconCodePoint: Icons.house.codePoint));
+    HabitManager.addHabit(Habit(title: "Title2", color: Colors.orange.value, iconCodePoint: Icons.house.codePoint));
   }
   
 }

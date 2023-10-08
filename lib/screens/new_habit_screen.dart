@@ -11,6 +11,22 @@ String _selectedFrequency = 'None';
 int _selectedColor = 0;
 int _selectedIcon = 0;
 
+void onCompleteButtonPress(BuildContext context) {
+  if (_formKey.currentState!.validate()) {
+    String title = _titleController.text;
+    String description = _descriptionController.text;
+    String frequency = _selectedFrequency;
+    int iconPoint = _selectedIcon;
+    int colorValue = _selectedColor;
+
+    // Create new Habit
+    var newHabit = Habit(title: title, description: description, color: colorValue, iconCodePoint: iconPoint);
+    // Add habit to SharedPreferences using HabitManager
+    HabitManager.addHabit(newHabit);
+    Navigator.pop(context);
+  }
+}
+
 class NewHabitScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -56,25 +72,11 @@ class NewHabitScreen extends StatelessWidget {
       ),
     );
   }
-
   const NewHabitScreen({super.key});
 }
 
+
 class Header extends StatelessWidget {
-  void onCompleteButtonPress() {
-    if (_formKey.currentState!.validate()) {
-      String title = _titleController.text;
-      String description = _descriptionController.text;
-      String frequency = _selectedFrequency;
-      int iconPoint = _selectedIcon;
-      int colorValue = _selectedColor;
-
-      // Create new Habit
-      var newHabit = Habit(title: title, description: description, color: colorValue, iconCodePoint: iconPoint);
-      // Add habit to SharedPreferences using HabitManager
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -114,38 +116,16 @@ class Header extends StatelessWidget {
                   IconButton(
                     icon: Icon(Icons.check_circle_outline_rounded,
                         color: Colors.white, size: iconSize),
-                    onPressed: onCompleteButtonPress,
+                    onPressed: () => onCompleteButtonPress(context),
                   ),
                   const SizedBox(width: 10),
                 ],
               ),
             ]));
   }
-
   const Header({super.key});
   final double iconSize = 30.0;
 }
-
-/*
-class HabitCreationWidget extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-        width: MediaQuery.of(context).size.width,
-        padding: const EdgeInsets.all(30.0),
-        color: Colors.black,
-        child: Container(
-            color: Colors.black,
-            child: Column(children: <Widget>[
-              InputWidget(name: 'Title'),
-              InputWidget(name: 'Description'),
-              const Align(
-                  alignment: Alignment.centerLeft, child: DropDownButton()),
-            ])));
-  }
-
-  const HabitCreationWidget({super.key});
-}*/
 
 class InputWidget extends StatelessWidget {
   @override
@@ -155,6 +135,7 @@ class InputWidget extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 4),
           child: TextFormField(
+            controller: controller,
             focusNode: focusNode,
             cursorColor: Colors.white,
             style: TextStyle(color: Colors.white, fontSize: inputLabelSize),
@@ -178,28 +159,23 @@ class InputWidget extends StatelessWidget {
   }
 
   InputWidget({super.key, required this.name, required this.controller});
-
   FocusNode focusNode = FocusNode();
   final TextEditingController controller;
   final String name;
 
   // Colors
   final Color nameColor = Colors.white;
-  final Color inputColor = HexColor.fromHex("#353535");
-
   // Sizes
   final double inputLabelSize = 20;
   final double inputTextSize = 16;
-  final double colorsSpacing = 5;
-  final double iconsSpacing = 5;
 }
+
 
 class DropDownButton extends StatefulWidget {
   const DropDownButton({super.key});
   @override
   State<StatefulWidget> createState() => DropDownButtonState();
 }
-
 class DropDownButtonState extends State<DropDownButton> {
   var dropdownValue = 'None';
   List<String> frequencyList = <String>[
