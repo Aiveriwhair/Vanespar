@@ -7,7 +7,7 @@ import '../main.dart';
 final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 final TextEditingController _titleController = TextEditingController();
 final TextEditingController _descriptionController = TextEditingController();
-String _selectedFrequency = 'None';
+String _selectedFrequency = 'Daily';
 int _selectedColor = 0;
 int _selectedIcon = 0;
 
@@ -20,7 +20,7 @@ void onCompleteButtonPress(BuildContext context) {
     int colorValue = _selectedColor;
 
     // Create new Habit
-    var newHabit = Habit(title: title, description: description, color: colorValue, iconCodePoint: iconPoint);
+    var newHabit = Habit(title: title, description: description, frequency: frequency, color: colorValue, iconCodePoint: iconPoint);
     // Add habit to SharedPreferences using HabitManager
     HabitManager.addHabit(newHabit);
     _titleController.text = "";
@@ -179,9 +179,8 @@ class DropDownButton extends StatefulWidget {
   State<StatefulWidget> createState() => DropDownButtonState();
 }
 class DropDownButtonState extends State<DropDownButton> {
-  var dropdownValue = 'None';
+  var dropdownValue = 'Daily';
   List<String> frequencyList = <String>[
-    'None',
     'Daily',
     'Weekly',
     'Monthly',
