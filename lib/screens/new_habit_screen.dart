@@ -23,6 +23,8 @@ void onCompleteButtonPress(BuildContext context) {
     var newHabit = Habit(title: title, description: description, color: colorValue, iconCodePoint: iconPoint);
     // Add habit to SharedPreferences using HabitManager
     HabitManager.addHabit(newHabit);
+    _titleController.text = "";
+    _descriptionController.text = "";
     Navigator.pop(context);
   }
 }
@@ -231,27 +233,29 @@ class IconGrid extends StatefulWidget {
 class _IconGridState extends State<IconGrid> {
   int selectedIndex = 0;
   List<IconData> icons = [
-    Icons.abc,
-    Icons.abc,
-    Icons.abc,
-    Icons.abc,
-    Icons.abc,
-    Icons.abc,
-    Icons.abc,
-    Icons.abc,
-    Icons.abc,
-    Icons.abc,
-    Icons.abc,
-    Icons.abc,
-    Icons.abc,
-    Icons.abc,
-    Icons.abc,
-    Icons.abc,
-    Icons.abc,
-    Icons.abc,
-    Icons.abc,
-    Icons.abc,
-    Icons.abc,
+    Icons.bed_rounded,
+    Icons.shower_rounded,
+    Icons.phone_enabled_rounded,
+    Icons.lunch_dining_rounded,
+    Icons.wallet_rounded,
+    Icons.directions_run_rounded,
+    Icons.weekend_rounded,
+
+    Icons.access_alarm_rounded,
+    Icons.menu_book,
+    Icons.add_a_photo_rounded,
+    Icons.access_time_filled_rounded,
+    Icons.calendar_month_rounded,
+    Icons.work,
+    Icons.house_rounded,
+
+    Icons.draw_rounded,
+    Icons.code_rounded,
+    Icons.coffee_outlined,
+    Icons.attach_money_rounded,
+    Icons.apple_rounded,
+    Icons.monitor_heart_rounded,
+    Icons.music_note_rounded,
   ];
 
   @override
@@ -263,7 +267,7 @@ class _IconGridState extends State<IconGrid> {
           return Container(
             decoration: BoxDecoration(
                 border: Border.all(width:2,color:  (selectedIndex == index ? Colors.white : Colors.black)),
-                borderRadius: BorderRadius.circular(20)),
+                borderRadius: BorderRadius.circular(25)),
               child: GestureDetector(
                 onTap: () {
                   setState(() {
@@ -290,27 +294,25 @@ class _ColorGridState extends State<ColorGrid> {
 
   int selectedIndex = 0;
   List<String> colorsHexs = [
-    "#FDF1D0",
     "#D3D5AE",
     "#A6BA92",
     "#76A07B",
     "#43866A",
     "#006C5E",
-    "#BFDFCE",
+
     "#9AC0B7",
     "#79A1A0",
     "#5D8289",
     "#446571",
     "#2F4858",
-    "#CCDAF5",
     "#B9BDDF",
+
     "#ABA1C6",
     "#9E84AA",
     "#92688C",
     "#854C6B",
     "#FFCCB2",
     "#FFDE87",
-    "#F9F871"
   ];
 
   @override
@@ -324,8 +326,8 @@ class _ColorGridState extends State<ColorGrid> {
             height: 20,
               decoration: BoxDecoration(
                   color: HexColor.fromHex(colorsHexs[index]),
-                  border: Border.all(width:2,color:  (selectedIndex == index ? Colors.white : Colors.black)),
-                  borderRadius: BorderRadius.circular(20)),
+                  border: Border.all(width:2, color:  (selectedIndex == index ? Colors.white : Colors.black)),
+                  borderRadius: BorderRadius.circular(25)),
               child: GestureDetector(
                   onTap: () {
                     setState(() {
