@@ -284,30 +284,36 @@ class _CustomListItemState extends State<CustomListItem> {
                   Row(
                     children: [
                       Container(
-                          decoration: BoxDecoration(
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(10)),
-                            color: widget.color,
-                          ),
-                          width: iconSize,
-                          height: iconSize,
-                          child: Icon(
-                            widget.iconData,
-                            color: Colors.white,
-                          )),
-                      const SizedBox(width: 5),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(widget.title,
-                              style: TextStyle(
-                                  color: Colors.white, fontSize: titleSize)),
-                          Text(widget.description,
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: descriptionSize))
-                        ],
+                        decoration: BoxDecoration(
+                          borderRadius:
+                            const BorderRadius.all(Radius.circular(10)),
+                          color: widget.color,
+                        ),
+                        width: iconSize,
+                        height: iconSize,
+                        child: Icon(
+                          widget.iconData,
+                          color: Colors.white,
+                        )
                       ),
+                      const SizedBox(width: 5),
+                      ConstrainedBox(
+                        constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width - 150),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(widget.title,
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: titleSize)),
+                            Text(widget.description,
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: descriptionSize))
+                          ],
+                        ),
+                      )
                     ],
                   ),
                   Container(
