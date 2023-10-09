@@ -13,7 +13,7 @@ import '../main.dart';
 void onNewHabitPress(BuildContext context) {
   Navigator.of(context).push(
     MaterialPageRoute(
-      builder: (context) => const NewHabitScreen(),
+      builder: (context) => NewHabitScreen(),
     ),
   );
 }

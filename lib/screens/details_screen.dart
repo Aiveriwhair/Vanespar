@@ -3,6 +3,15 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:vanespar/logic/habit.dart';
 import 'package:vanespar/logic/habit_manager.dart';
+import 'package:vanespar/screens/new_habit_screen.dart';
+
+void onEditHabitPress(BuildContext context, Habit habit) {
+  Navigator.pop(context);
+  Navigator.push(
+    context,
+    MaterialPageRoute(builder: (context) => NewHabitScreen.edit(habit)),
+  );
+}
 
 void showDetailsDialog(BuildContext context, String habitId) {
   Habit habit = HabitManager.getHabitById(habitId);
@@ -78,7 +87,7 @@ void showDetailsDialog(BuildContext context, String habitId) {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     IconButton(
-                      onPressed: (){},
+                      onPressed: (){ onEditHabitPress(context, habit); },
                       icon: const Icon(
                         Icons.edit,
                         color: Colors.white,

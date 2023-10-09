@@ -10,6 +10,8 @@ final TextEditingController _descriptionController = TextEditingController();
 String _selectedFrequency = 'Daily';
 int _selectedColor = HexColor.fromHex("#D3D5AE").value;
 int _selectedIcon = Icons.bed_rounded.codePoint;
+bool _isEdit = false;
+String _oldHabitId = "";
 
 void onCompleteButtonPress(BuildContext context) {
   if (_formKey.currentState!.validate()) {
@@ -19,10 +21,14 @@ void onCompleteButtonPress(BuildContext context) {
     int iconPoint = _selectedIcon;
     int colorValue = _selectedColor;
 
-    // Create new Habit
-    var newHabit = Habit(title: title, description: description, frequency: frequency, color: colorValue, iconCodePoint: iconPoint);
-    // Add habit to SharedPreferences using HabitManager
-    HabitManager.addHabit(newHabit);
+    if(!_isEdit) {
+      // Create new Habit
+      var newHabit = Habit(title: title, description: description, frequency: frequency, color: colorValue, iconCodePoint: iconPoint);
+      // Add habit to SharedPreferences using HabitManager
+      HabitManager.addHabit(newHabit);
+    } else {
+      HabitManager.editHabit(_oldHabitId, title, description, frequency, colorValue, iconPoint);
+    }
     _titleController.text = "";
     _descriptionController.text = "";
     Navigator.pop(context);
@@ -74,7 +80,25 @@ class NewHabitScreen extends StatelessWidget {
       ),
     );
   }
-  const NewHabitScreen({super.key});
+  NewHabitScreen({super.key}) {
+    _isEdit = false;
+    _oldHabitId = "";
+    _titleController.text = "";
+    _descriptionController.text = "";
+    _selectedFrequency = 'Daily';
+    _selectedIcon = Icons.bed_rounded.codePoint;
+    _selectedColor = HexColor.fromHex("#D3D5AE").value;
+  }
+
+  NewHabitScreen.edit(Habit habit, {super.key}) {
+    _isEdit = true;
+    _oldHabitId = habit.id;
+    _titleController.text = habit.title;
+    _descriptionController.text = habit.description;
+    _selectedFrequency = habit.frequency;
+    _selectedIcon = habit.iconCodePoint;
+    _selectedColor = habit.color;
+  }
 }
 
 
@@ -91,7 +115,7 @@ class Header extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   Text(
-                    'New ',
+                    _isEdit ? 'Edit ' : 'New ',
                     textAlign: TextAlign.center,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
@@ -179,7 +203,7 @@ class DropDownButton extends StatefulWidget {
   State<StatefulWidget> createState() => DropDownButtonState();
 }
 class DropDownButtonState extends State<DropDownButton> {
-  var dropdownValue = 'Daily';
+  var dropdownValue = _selectedFrequency;
   List<String> frequencyList = <String>[
     'Daily',
     'Weekly',
@@ -230,7 +254,6 @@ class IconGrid extends StatefulWidget {
 }
 
 class _IconGridState extends State<IconGrid> {
-  int selectedIndex = 0;
   List<IconData> icons = [
     Icons.bed_rounded,
     Icons.shower_rounded,
@@ -257,8 +280,11 @@ class _IconGridState extends State<IconGrid> {
     Icons.music_note_rounded,
   ];
 
+
   @override
   Widget build(BuildContext context) {
+    int selectedIndex = icons.indexWhere((element) => element.codePoint == _selectedIcon);
+
     return GridView.builder(
         itemCount: icons.length,
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 7),
@@ -289,9 +315,6 @@ class ColorGrid extends StatefulWidget {
 }
 
 class _ColorGridState extends State<ColorGrid> {
-  int selectedIcon = -1;
-
-  int selectedIndex = 0;
   List<String> colorsHexs = [
     "#D3D5AE",
     "#A6BA92",
@@ -316,6 +339,7 @@ class _ColorGridState extends State<ColorGrid> {
 
   @override
   Widget build(BuildContext context) {
+    int selectedIndex = colorsHexs.indexWhere((element) => HexColor.fromHex(element).value == _selectedColor);
     return GridView.builder(
         itemCount: colorsHexs.length,
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 7),
