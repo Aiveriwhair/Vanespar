@@ -4,6 +4,7 @@ import 'package:vanespar/logic/habit_manager.dart';
 import 'package:vanespar/screens/new_habit_screen.dart';
 import 'package:vanespar/screens/parameters_screen.dart';
 import 'package:vanespar/screens/stats_screen.dart';
+import 'package:vanespar/screens/details_screen.dart';
 
 import 'dart:ui';
 
@@ -264,7 +265,11 @@ class _CustomListItemState extends State<CustomListItem> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return InkWell(
+      onTap: () {
+        showDetailsDialog(context, widget.id);
+      },
+      child: Container(
         color: Colors.black,
         padding: const EdgeInsets.fromLTRB(10, 4, 10, 4),
         child: Container(
@@ -348,7 +353,11 @@ class _CustomListItemState extends State<CustomListItem> {
                   },
                 ),
               )
-            ])));
+            ]
+          )
+        )
+      )
+    );
   }
 
   // Colors

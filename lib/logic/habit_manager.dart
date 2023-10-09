@@ -45,6 +45,10 @@ class HabitManager {
     return habits;
   }
 
+  static Habit getHabitById(String id) {
+    return habits.firstWhere((habit) => habit.id == id);
+  }
+
   static void reorderHabit(int oldIndex, int newIndex) {
     if (newIndex > oldIndex) {
       newIndex -= 1;
