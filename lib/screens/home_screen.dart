@@ -185,33 +185,6 @@ class MyListWidget extends StatelessWidget {
         color: Color(habit.color),
       ));
     }
-/*
-    List<Widget> items = [
-      CustomListItem(
-        title: "Title",
-        description: "Description",
-        isCompleted: true,
-        iconData: Icons.house,
-        lastDaysCompletion: const [true, false, true, false, true, false],
-        color: Colors.orange,
-      ),
-      CustomListItem(
-        title: "Title",
-        description: "Description",
-        isCompleted: false,
-        iconData: Icons.shower,
-        lastDaysCompletion: const [true, false, false, false, true, true],
-        color: Colors.blue,
-      ),
-      CustomListItem(
-        title: "Title",
-        description: "Description",
-        isCompleted: true,
-        iconData: Icons.bed,
-        lastDaysCompletion: const [true, true, true, true, true, false],
-        color: Colors.red,
-      ),
-    ];*/
 
     return Container(
         color: Colors.black,

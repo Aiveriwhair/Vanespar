@@ -9,10 +9,6 @@ class HabitManager {
   static final _habitsStreamController = StreamController<List<Habit>>.broadcast();
   static Stream<List<Habit>> get habitsStream => _habitsStreamController.stream;
 
-  HabitManager(){
-    _initSharedPreferences();
-  }
-
   static void load() {
     _initSharedPreferences();
   }
@@ -43,6 +39,14 @@ class HabitManager {
 
   static List<Habit> getHabits() {
     return habits;
+  }
+
+  static List<Habit> getCompletableHabitsOnDay(DateTime day){
+    return habits.where((element) => element.isCompletableOnDay(day)).toList();
+  }
+
+  static List<Habit> getCompletedHabitsOnDay(DateTime day){
+    return habits.where((element) => element.completedOnDay(day)).toList();
   }
 
   static void reorderHabit(int oldIndex, int newIndex) {
