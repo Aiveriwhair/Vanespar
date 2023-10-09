@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:vanespar/logic/habit.dart';
 import 'package:vanespar/logic/habit_manager.dart';
@@ -37,20 +39,23 @@ void onDeleteButtonPress(BuildContext context) {
   showDialog(
     context: context,
     builder: (context) {
-      return AlertDialog(
-        backgroundColor: Colors.black,
-        title: const Text("Delete Habit", style: TextStyle(color: Colors.white)),
-        content: const Text("Are you sure you want to delete this habit?", style: TextStyle(color: Colors.white)),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text("Cancel"),
-          ),
-          TextButton(
-            onPressed: () => onDeleteConfirmButtonPress(context),
-            child: const Text("Delete", style: TextStyle(color: Colors.red)),
-          ),
-        ],
+      return BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+        child: AlertDialog(
+          backgroundColor: Colors.black,
+          title: const Text("Delete Habit", style: TextStyle(color: Colors.white)),
+          content: const Text("Are you sure you want to delete this habit?", style: TextStyle(color: Colors.white)),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("Cancel"),
+            ),
+            TextButton(
+              onPressed: () => onDeleteConfirmButtonPress(context),
+              child: const Text("Delete", style: TextStyle(color: Colors.red)),
+            ),
+          ],
+        )
       );
     }
   );
