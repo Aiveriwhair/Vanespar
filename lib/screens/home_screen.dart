@@ -171,10 +171,9 @@ class MyListWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    HabitManager habitManager = HabitManager();
 
     List<Widget> items = [];
-    for (var habit in habitManager.getHabits()) {
+    for (var habit in HabitManager.getHabits()) {
       items.add(CustomListItem(
         id: habit.id,
         title: habit.title,
