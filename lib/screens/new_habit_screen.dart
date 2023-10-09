@@ -29,10 +29,37 @@ void onCompleteButtonPress(BuildContext context) {
     } else {
       HabitManager.editHabit(_oldHabitId, title, description, frequency, colorValue, iconPoint);
     }
-    _titleController.text = "";
-    _descriptionController.text = "";
     Navigator.pop(context);
   }
+}
+
+void onDeleteButtonPress(BuildContext context) {
+  showDialog(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        backgroundColor: Colors.black,
+        title: const Text("Delete Habit", style: TextStyle(color: Colors.white)),
+        content: const Text("Are you sure you want to delete this habit?", style: TextStyle(color: Colors.white)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Cancel"),
+          ),
+          TextButton(
+            onPressed: () => onDeleteConfirmButtonPress(context),
+            child: const Text("Delete", style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      );
+    }
+  );
+}
+
+void onDeleteConfirmButtonPress(BuildContext context) {
+  HabitManager.deleteHabit(_oldHabitId);
+  Navigator.pop(context);
+  Navigator.pop(context);
 }
 
 class NewHabitScreen extends StatelessWidget {
@@ -75,6 +102,11 @@ class NewHabitScreen extends StatelessWidget {
                       child:Text("Color", style: TextStyle(color: Colors.white))),
                 ),
                 const Expanded(child: ColorGrid()),
+                if(_isEdit) 
+                  IconButton(
+                    onPressed: (){ onDeleteButtonPress(context); },
+                    icon: const Icon(Icons.delete, color: Colors.red, size: 30)
+                  )
               ],
             )),
       ),

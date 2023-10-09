@@ -79,4 +79,9 @@ class HabitManager {
     habits[index].iconCodePoint = iconPoint;
     _saveHabitsToPrefs();
   }
+
+  static void deleteHabit(String id) {
+    habits.removeWhere((habit) => habit.id == id);
+    _saveHabitsToPrefs();
+  }
 }
