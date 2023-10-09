@@ -8,8 +8,8 @@ final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 final TextEditingController _titleController = TextEditingController();
 final TextEditingController _descriptionController = TextEditingController();
 String _selectedFrequency = 'Daily';
-int _selectedColor = 0;
-int _selectedIcon = 0;
+int _selectedColor = HexColor.fromHex("#D3D5AE").value;
+int _selectedIcon = Icons.bed_rounded.codePoint;
 
 void onCompleteButtonPress(BuildContext context) {
   if (_formKey.currentState!.validate()) {
