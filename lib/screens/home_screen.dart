@@ -411,45 +411,40 @@ class _MyStatefulListWidgetState extends State<MyStatefulListWidget> {
   @override
   Widget build(BuildContext context) {
     return Container(
-        color: Colors.black,
-        child: Column(children: [
-          Expanded(
-              child: StreamBuilder<List<Habit>>(
-            stream: HabitManager.habitsStream, // Stream of habits
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                // ReorderableListView with CustomListItem widgets
-                return ReorderableListView(
-                  onReorder: (oldIndex, newIndex) =>
-                      HabitManager.reorderHabit(oldIndex, newIndex),
-                  proxyDecorator: widget.scaleUpDecorator,
-                  children: snapshot.data!
-                      .map((habit) => CustomListItem(
-                            id: habit.id,
-                            title: habit.title,
-                            description: habit.description,
-                            isCompleted: habit.isCompletedToday(),
-                            iconData: habit.getIconData(),
-                            lastDaysCompletion: habit.getLastDaysCompletion(6),
-                            color: Color(habit.color),
-                            frequency: habit.frequency,
-                            key: ValueKey<String>(habit.id),
-                          ))
-                      .toList(),
-                );
-              } else if (snapshot.hasError) {
-                // Handle error
-                return Text('Error: ${snapshot.error}');
-              } else {
-                // Show loading indicator
-                return const Center(child: CircularProgressIndicator());
-              }
-            },
-          )),
-          IconButton(
-              onPressed: addHabit,
-              icon: const Icon(Icons.add, color: Colors.white, size: 50)),
-        ]));
+      color: Colors.black,
+      child: StreamBuilder<List<Habit>>(
+        stream: HabitManager.habitsStream, // Stream of habits
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            // ReorderableListView with CustomListItem widgets
+            return ReorderableListView(
+              onReorder: (oldIndex, newIndex) =>
+                  HabitManager.reorderHabit(oldIndex, newIndex),
+              proxyDecorator: widget.scaleUpDecorator,
+              children: snapshot.data!
+                  .map((habit) => CustomListItem(
+                        id: habit.id,
+                        title: habit.title,
+                        description: habit.description,
+                        isCompleted: habit.isCompletedToday(),
+                        iconData: habit.getIconData(),
+                        lastDaysCompletion: habit.getLastDaysCompletion(6),
+                        color: Color(habit.color),
+                        frequency: habit.frequency,
+                        key: ValueKey<String>(habit.id),
+                      ))
+                  .toList(),
+            );
+          } else if (snapshot.hasError) {
+            // Handle error
+            return Text('Error: ${snapshot.error}');
+          } else {
+            // Show loading indicator
+            return const Center(child: CircularProgressIndicator());
+          }
+        }
+      )
+    );
   }
 
   void addHabit() {
