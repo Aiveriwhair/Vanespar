@@ -41,7 +41,7 @@ class HabitManager {
     _saveHabitsToPrefs();
   }
 
-  List<Habit> getHabits() {
+  static List<Habit> getHabits() {
     return habits;
   }
 
