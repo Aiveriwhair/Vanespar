@@ -336,10 +336,11 @@ class _CustomListItemState extends State<CustomListItem> {
                 ],
               ),
               Container(
-                width: 250,
                 height: 20,
                 padding: const EdgeInsets.all(5.0),
+                margin: const EdgeInsets.only(top: 10),
                 child: ListView.builder(
+                  shrinkWrap: true,
                   itemCount: widget.lastDaysCompletion.length,
                   scrollDirection: Axis.horizontal,
                   itemBuilder: (context, index) {
