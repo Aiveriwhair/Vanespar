@@ -4,6 +4,7 @@ import 'package:vanespar/logic/habit_manager.dart';
 import 'package:vanespar/screens/new_habit_screen.dart';
 import 'package:vanespar/screens/parameters_screen.dart';
 import 'package:vanespar/screens/stats_screen.dart';
+import 'package:vanespar/screens/details_screen.dart';
 
 import 'dart:ui';
 
@@ -12,7 +13,7 @@ import '../main.dart';
 void onNewHabitPress(BuildContext context) {
   Navigator.of(context).push(
     MaterialPageRoute(
-      builder: (context) => const NewHabitScreen(),
+      builder: (context) => NewHabitScreen(),
     ),
   );
 }
@@ -237,7 +238,11 @@ class _CustomListItemState extends State<CustomListItem> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return InkWell(
+      onTap: () {
+        showDetailsDialog(context, widget.id);
+      },
+      child: Container(
         color: Colors.black,
         padding: const EdgeInsets.fromLTRB(10, 4, 10, 4),
         child: Container(
@@ -252,30 +257,36 @@ class _CustomListItemState extends State<CustomListItem> {
                   Row(
                     children: [
                       Container(
-                          decoration: BoxDecoration(
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(10)),
-                            color: widget.color,
-                          ),
-                          width: iconSize,
-                          height: iconSize,
-                          child: Icon(
-                            widget.iconData,
-                            color: Colors.white,
-                          )),
-                      const SizedBox(width: 5),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(widget.title,
-                              style: TextStyle(
-                                  color: Colors.white, fontSize: titleSize)),
-                          Text(widget.description,
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: descriptionSize))
-                        ],
+                        decoration: BoxDecoration(
+                          borderRadius:
+                            const BorderRadius.all(Radius.circular(10)),
+                          color: widget.color,
+                        ),
+                        width: iconSize,
+                        height: iconSize,
+                        child: Icon(
+                          widget.iconData,
+                          color: Colors.white,
+                        )
                       ),
+                      const SizedBox(width: 5),
+                      ConstrainedBox(
+                        constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width - 150),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(widget.title,
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: titleSize)),
+                            Text(widget.description,
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: descriptionSize))
+                          ],
+                        ),
+                      )
                     ],
                   ),
                   Container(
@@ -298,10 +309,11 @@ class _CustomListItemState extends State<CustomListItem> {
                 ],
               ),
               Container(
-                width: 250,
                 height: 20,
                 padding: const EdgeInsets.all(5.0),
+                margin: const EdgeInsets.only(top: 10),
                 child: ListView.builder(
+                  shrinkWrap: true,
                   itemCount: widget.lastDaysCompletion.length,
                   scrollDirection: Axis.horizontal,
                   itemBuilder: (context, index) {
@@ -321,7 +333,11 @@ class _CustomListItemState extends State<CustomListItem> {
                   },
                 ),
               )
-            ])));
+            ]
+          )
+        )
+      )
+    );
   }
 
   // Colors
@@ -368,45 +384,40 @@ class _MyStatefulListWidgetState extends State<MyStatefulListWidget> {
   @override
   Widget build(BuildContext context) {
     return Container(
-        color: Colors.black,
-        child: Column(children: [
-          Expanded(
-              child: StreamBuilder<List<Habit>>(
-            stream: HabitManager.habitsStream, // Stream of habits
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                // ReorderableListView with CustomListItem widgets
-                return ReorderableListView(
-                  onReorder: (oldIndex, newIndex) =>
-                      HabitManager.reorderHabit(oldIndex, newIndex),
-                  proxyDecorator: widget.scaleUpDecorator,
-                  children: snapshot.data!
-                      .map((habit) => CustomListItem(
-                            id: habit.id,
-                            title: habit.title,
-                            description: habit.description,
-                            isCompleted: habit.isCompletedToday(),
-                            iconData: habit.getIconData(),
-                            lastDaysCompletion: habit.getLastDaysCompletion(6),
-                            color: Color(habit.color),
-                            frequency: habit.frequency,
-                            key: ValueKey<String>(habit.id),
-                          ))
-                      .toList(),
-                );
-              } else if (snapshot.hasError) {
-                // Handle error
-                return Text('Error: ${snapshot.error}');
-              } else {
-                // Show loading indicator
-                return const Center(child: CircularProgressIndicator());
-              }
-            },
-          )),
-          IconButton(
-              onPressed: addHabit,
-              icon: const Icon(Icons.add, color: Colors.white, size: 50)),
-        ]));
+      color: Colors.black,
+      child: StreamBuilder<List<Habit>>(
+        stream: HabitManager.habitsStream, // Stream of habits
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            // ReorderableListView with CustomListItem widgets
+            return ReorderableListView(
+              onReorder: (oldIndex, newIndex) =>
+                  HabitManager.reorderHabit(oldIndex, newIndex),
+              proxyDecorator: widget.scaleUpDecorator,
+              children: snapshot.data!
+                  .map((habit) => CustomListItem(
+                        id: habit.id,
+                        title: habit.title,
+                        description: habit.description,
+                        isCompleted: habit.isCompletedToday(),
+                        iconData: habit.getIconData(),
+                        lastDaysCompletion: habit.getLastDaysCompletion(6),
+                        color: Color(habit.color),
+                        frequency: habit.frequency,
+                        key: ValueKey<String>(habit.id),
+                      ))
+                  .toList(),
+            );
+          } else if (snapshot.hasError) {
+            // Handle error
+            return Text('Error: ${snapshot.error}');
+          } else {
+            // Show loading indicator
+            return const Center(child: CircularProgressIndicator());
+          }
+        }
+      )
+    );
   }
 
   void addHabit() {

@@ -6,7 +6,8 @@ import 'habit.dart';
 class HabitManager {
   static List<Habit> habits = [];
   static late SharedPreferences _prefs;
-  static final _habitsStreamController = StreamController<List<Habit>>.broadcast();
+  static final _habitsStreamController =
+      StreamController<List<Habit>>.broadcast();
   static Stream<List<Habit>> get habitsStream => _habitsStreamController.stream;
 
   static void load() {
@@ -20,7 +21,8 @@ class HabitManager {
 
   static void _loadHabitsFromPrefs() {
     List<String> habitsJson = _prefs.getStringList('habits') ?? [];
-    List<Map<String, dynamic>> habitsData = List<Map<String, dynamic>>.from(habitsJson.map((habit) => json.decode(habit)).toList());
+    List<Map<String, dynamic>> habitsData = List<Map<String, dynamic>>.from(
+        habitsJson.map((habit) => json.decode(habit)).toList());
     habits = habitsData.map((habitData) => Habit.fromJson(habitData)).toList();
     _habitsStreamController.add(habits);
   }
@@ -41,12 +43,16 @@ class HabitManager {
     return habits;
   }
 
-  static List<Habit> getCompletableHabitsOnDay(DateTime day){
+  static List<Habit> getCompletableHabitsOnDay(DateTime day) {
     return habits.where((element) => element.isCompletableOnDay(day)).toList();
   }
 
-  static List<Habit> getCompletedHabitsOnDay(DateTime day){
+  static List<Habit> getCompletedHabitsOnDay(DateTime day) {
     return habits.where((element) => element.completedOnDay(day)).toList();
+  }
+
+  static Habit getHabitById(String id) {
+    return habits.firstWhere((habit) => habit.id == id);
   }
 
   static void reorderHabit(int oldIndex, int newIndex) {
@@ -61,11 +67,28 @@ class HabitManager {
 
   static void setHabitLastDayCompletion(String habitId, bool completed) {
     int index = habits.indexWhere((element) => element.id == habitId);
-    if(habits[index].isCompletedToday() && !completed){
+    if (habits[index].isCompletedToday() && !completed) {
       habits[index].completionDates.removeLast();
-    } else if(!habits[index].isCompletedToday() && completed){
+    } else if (!habits[index].isCompletedToday() && completed) {
       habits[index].completionDates.add(DateTime.now());
     }
+    _saveHabitsToPrefs();
+  }
+
+  // Edit habit based on id
+  static void editHabit(String id, String title, String description,
+      String frequency, int colorValue, int iconPoint) {
+    int index = habits.indexWhere((element) => element.id == id);
+    habits[index].title = title;
+    habits[index].description = description;
+    habits[index].frequency = frequency;
+    habits[index].color = colorValue;
+    habits[index].iconCodePoint = iconPoint;
+    _saveHabitsToPrefs();
+  }
+
+  static void deleteHabit(String id) {
+    habits.removeWhere((habit) => habit.id == id);
     _saveHabitsToPrefs();
   }
 }

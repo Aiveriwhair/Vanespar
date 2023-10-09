@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:vanespar/logic/habit.dart';
 import 'package:vanespar/logic/habit_manager.dart';
@@ -10,6 +12,8 @@ final TextEditingController _descriptionController = TextEditingController();
 String _selectedFrequency = 'Daily';
 int _selectedColor = HexColor.fromHex("#D3D5AE").value;
 int _selectedIcon = Icons.bed_rounded.codePoint;
+bool _isEdit = false;
+String _oldHabitId = "";
 
 void onCompleteButtonPress(BuildContext context) {
   if (_formKey.currentState!.validate()) {
@@ -19,14 +23,48 @@ void onCompleteButtonPress(BuildContext context) {
     int iconPoint = _selectedIcon;
     int colorValue = _selectedColor;
 
-    // Create new Habit
-    var newHabit = Habit(title: title, description: description, frequency: frequency, color: colorValue, iconCodePoint: iconPoint);
-    // Add habit to SharedPreferences using HabitManager
-    HabitManager.addHabit(newHabit);
-    _titleController.text = "";
-    _descriptionController.text = "";
+    if(!_isEdit) {
+      // Create new Habit
+      var newHabit = Habit(title: title, description: description, frequency: frequency, color: colorValue, iconCodePoint: iconPoint);
+      // Add habit to SharedPreferences using HabitManager
+      HabitManager.addHabit(newHabit);
+    } else {
+      HabitManager.editHabit(_oldHabitId, title, description, frequency, colorValue, iconPoint);
+    }
     Navigator.pop(context);
   }
+}
+
+void onDeleteButtonPress(BuildContext context) {
+  showDialog(
+    context: context,
+    builder: (context) {
+      return BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+        child: AlertDialog(
+          backgroundColor: Colors.black,
+          title: const Text("Delete Habit", style: TextStyle(color: Colors.white)),
+          content: const Text("Are you sure you want to delete this habit?", style: TextStyle(color: Colors.white)),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("Cancel"),
+            ),
+            TextButton(
+              onPressed: () => onDeleteConfirmButtonPress(context),
+              child: const Text("Delete", style: TextStyle(color: Colors.red)),
+            ),
+          ],
+        )
+      );
+    }
+  );
+}
+
+void onDeleteConfirmButtonPress(BuildContext context) {
+  HabitManager.deleteHabit(_oldHabitId);
+  Navigator.pop(context);
+  Navigator.pop(context);
 }
 
 class NewHabitScreen extends StatelessWidget {
@@ -69,12 +107,35 @@ class NewHabitScreen extends StatelessWidget {
                       child:Text("Color", style: TextStyle(color: Colors.white))),
                 ),
                 const Expanded(child: ColorGrid()),
+                if(_isEdit) 
+                  IconButton(
+                    onPressed: (){ onDeleteButtonPress(context); },
+                    icon: const Icon(Icons.delete, color: Colors.red, size: 30)
+                  )
               ],
             )),
       ),
     );
   }
-  const NewHabitScreen({super.key});
+  NewHabitScreen({super.key}) {
+    _isEdit = false;
+    _oldHabitId = "";
+    _titleController.text = "";
+    _descriptionController.text = "";
+    _selectedFrequency = 'Daily';
+    _selectedIcon = Icons.bed_rounded.codePoint;
+    _selectedColor = HexColor.fromHex("#D3D5AE").value;
+  }
+
+  NewHabitScreen.edit(Habit habit, {super.key}) {
+    _isEdit = true;
+    _oldHabitId = habit.id;
+    _titleController.text = habit.title;
+    _descriptionController.text = habit.description;
+    _selectedFrequency = habit.frequency;
+    _selectedIcon = habit.iconCodePoint;
+    _selectedColor = habit.color;
+  }
 }
 
 
@@ -91,7 +152,7 @@ class Header extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   Text(
-                    'New ',
+                    _isEdit ? 'Edit ' : 'New ',
                     textAlign: TextAlign.center,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
@@ -179,7 +240,7 @@ class DropDownButton extends StatefulWidget {
   State<StatefulWidget> createState() => DropDownButtonState();
 }
 class DropDownButtonState extends State<DropDownButton> {
-  var dropdownValue = 'Daily';
+  var dropdownValue = _selectedFrequency;
   List<String> frequencyList = <String>[
     'Daily',
     'Weekly',
@@ -230,7 +291,6 @@ class IconGrid extends StatefulWidget {
 }
 
 class _IconGridState extends State<IconGrid> {
-  int selectedIndex = 0;
   List<IconData> icons = [
     Icons.bed_rounded,
     Icons.shower_rounded,
@@ -257,8 +317,11 @@ class _IconGridState extends State<IconGrid> {
     Icons.music_note_rounded,
   ];
 
+
   @override
   Widget build(BuildContext context) {
+    int selectedIndex = icons.indexWhere((element) => element.codePoint == _selectedIcon);
+
     return GridView.builder(
         itemCount: icons.length,
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 7),
@@ -289,9 +352,6 @@ class ColorGrid extends StatefulWidget {
 }
 
 class _ColorGridState extends State<ColorGrid> {
-  int selectedIcon = -1;
-
-  int selectedIndex = 0;
   List<String> colorsHexs = [
     "#D3D5AE",
     "#A6BA92",
@@ -316,6 +376,7 @@ class _ColorGridState extends State<ColorGrid> {
 
   @override
   Widget build(BuildContext context) {
+    int selectedIndex = colorsHexs.indexWhere((element) => HexColor.fromHex(element).value == _selectedColor);
     return GridView.builder(
         itemCount: colorsHexs.length,
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 7),
