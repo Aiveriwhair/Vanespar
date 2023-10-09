@@ -68,4 +68,15 @@ class HabitManager {
     }
     _saveHabitsToPrefs();
   }
+
+  // Edit habit based on id
+  static void editHabit(String id, String title, String description, String frequency, int colorValue, int iconPoint) {
+    int index = habits.indexWhere((element) => element.id == id);
+    habits[index].title = title;
+    habits[index].description = description;
+    habits[index].frequency = frequency;
+    habits[index].color = colorValue;
+    habits[index].iconCodePoint = iconPoint;
+    _saveHabitsToPrefs();
+  }
 }
