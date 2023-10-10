@@ -15,8 +15,13 @@ int _selectedIcon = Icons.bed_rounded.codePoint;
 bool _isEdit = false;
 String _oldHabitId = "";
 
+bool isTitleExisting(){
+  return HabitManager.getHabits().any((element) => element.title == _titleController.text);
+}
+
 void onCompleteButtonPress(BuildContext context) {
   if (_formKey.currentState!.validate()) {
+    if(isTitleExisting()) return;
     String title = _titleController.text;
     String description = _descriptionController.text;
     String frequency = _selectedFrequency;
@@ -86,10 +91,12 @@ class NewHabitScreen extends StatelessWidget {
                 InputWidget(
                   controller: _titleController,
                   name: 'Title',
+                  isTitle: true
                 ),
                 InputWidget(
                   controller: _descriptionController,
                   name: 'Description',
+                    isTitle: false
                 ),
                 const Align(
                   alignment: Alignment.centerLeft,
@@ -190,7 +197,16 @@ class Header extends StatelessWidget {
   final double iconSize = 30.0;
 }
 
-class InputWidget extends StatelessWidget {
+class InputWidget extends StatefulWidget {
+  FocusNode focusNode = FocusNode();
+  TextEditingController controller;
+  String name;
+  bool isTitle;
+  InputWidget({super.key, required this.controller, required this.name, required this.isTitle});
+  @override
+  State<StatefulWidget> createState() => _InputWidgetState();
+}
+class _InputWidgetState extends State<InputWidget> {
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -198,12 +214,25 @@ class InputWidget extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 4),
           child: TextFormField(
-            controller: controller,
-            focusNode: focusNode,
+            onChanged: (newValue){
+              setState(() {
+              });
+            },
+            controller: widget.controller,
+            focusNode: widget.focusNode,
             cursorColor: Colors.white,
             style: TextStyle(color: Colors.white, fontSize: inputLabelSize),
             decoration: InputDecoration(
-              labelText: name,
+              errorText: (widget.isTitle && isTitleExisting() ? "This habit already exists" : null),
+              errorStyle: (widget.isTitle && isTitleExisting() ? TextStyle(
+                color: Colors.red,
+                fontSize: inputLabelSize)
+              :
+              TextStyle(
+                  color: Colors.white,
+                  fontSize: inputLabelSize)
+              ),
+              labelText: widget.name,
               labelStyle: TextStyle(
                 color: Colors.white,
                 fontSize: inputLabelSize,
@@ -220,11 +249,6 @@ class InputWidget extends StatelessWidget {
       ],
     );
   }
-
-  InputWidget({super.key, required this.name, required this.controller});
-  FocusNode focusNode = FocusNode();
-  final TextEditingController controller;
-  final String name;
 
   // Colors
   final Color nameColor = Colors.white;
