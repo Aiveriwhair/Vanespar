@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class Habit {
@@ -68,7 +69,9 @@ class Habit {
         element.day == day.day);
   }
   bool isCompletableOnDay(DateTime day) {
-    if(!(day.isAtSameMomentAs(creationDate) || !(day.isAfter(creationDate)))) return false;
+    if (!day.isAfter(creationDate)) {
+      return false;
+    }
     switch (frequency) {
       case "Daily":
         return true;
