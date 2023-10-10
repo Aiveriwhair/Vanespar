@@ -268,3 +268,20 @@ class MonthCalendarWidget extends StatelessWidget {
     );
   }
 }*/
+
+class TestWidget extends StatefulWidget {
+  final String string;
+  const TestWidget({super.key, required this.string});
+  @override
+  State<StatefulWidget> createState() => _TestWidgetState();
+}
+
+class _TestWidgetState extends State<TestWidget> {
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      widget.string,
+      style: const TextStyle(color: Colors.white),
+    );
+  }
+}

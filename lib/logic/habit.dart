@@ -69,7 +69,7 @@ class Habit {
         element.day == day.day);
   }
   bool isCompletableOnDay(DateTime day) {
-    if (!day.isAfter(creationDate)) {
+    if (day.isBefore(DateTime(creationDate.year, creationDate.month, creationDate.day))) {
       return false;
     }
     switch (frequency) {
