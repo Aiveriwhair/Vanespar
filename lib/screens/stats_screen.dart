@@ -50,8 +50,10 @@ class _StatsScreenState extends State<StatsScreen> {
             padding: const EdgeInsets.all(0.0),
             color: Colors.black,
             child: Column(
-              mainAxisSize: MainAxisSize.max,
               children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
                 Padding(
                     padding:
                         const EdgeInsets.symmetric(horizontal: 0, vertical: 8),
@@ -90,7 +92,6 @@ class _StatsScreenState extends State<StatsScreen> {
                         );
                       }).toList(),
                     )),
-                Column(children: [
                   Container(
                     height: 50,
                     width: 80 * calendarView.length.toDouble(),
@@ -126,10 +127,14 @@ class _StatsScreenState extends State<StatsScreen> {
                               ));
                         }),
                   ),
-                  calendarWidgets[modeSelectedIndex](calendarHabits)
+
+                  ],
+                ),
+                  calendarWidgets[modeSelectedIndex](calendarHabits),
+                  const TestWidget(string: "oui")
+                  //HabitListWidget(habits: calendarHabits)
                 ]),
-              ],
-            )));
+            ));
   }
 }
 
@@ -244,30 +249,31 @@ class _DayCalendarWidgetState extends State<DayCalendarWidget> {
   }
 }
 
-/*
-class WeekCalendarWidget extends StatelessWidget {
-  const WeekCalendarWidget({super.key});
+
+class HabitListWidget extends StatefulWidget{
+  List<Habit> habits;
+  HabitListWidget({super.key, required this.habits});
+  @override
+  State<StatefulWidget> createState() => _HabitListWidgetState();
+
+}
+class _HabitListWidgetState extends State<HabitListWidget> {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 20,
-      height: 20,
-      color: Colors.blue,
+    return ListView.builder(
+      itemCount: widget.habits.length,
+      itemBuilder: (BuildContext context, int index) {
+        Habit habit = widget.habits[index];
+        return ListTile(
+          title: Text(habit.title),
+          subtitle: Text(habit.description),
+        );
+      },
     );
   }
 }
 
-class MonthCalendarWidget extends StatelessWidget {
-  const MonthCalendarWidget({super.key});
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 20,
-      height: 20,
-      color: Colors.yellow,
-    );
-  }
-}*/
+
 
 class TestWidget extends StatefulWidget {
   final String string;
@@ -275,7 +281,6 @@ class TestWidget extends StatefulWidget {
   @override
   State<StatefulWidget> createState() => _TestWidgetState();
 }
-
 class _TestWidgetState extends State<TestWidget> {
   @override
   Widget build(BuildContext context) {
