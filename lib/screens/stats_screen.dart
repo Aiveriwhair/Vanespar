@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:vanespar/logic/TimeUtils.dart';
@@ -34,11 +32,12 @@ class _StatsScreenState extends State<StatsScreen> {
   List<String> calendarView = [
     "Day",
   ];
-  List<Widget Function(List<Habit>)> calendarWidgets = [
-    (List<Habit> habits) => DayCalendarWidget(habits: habits),
+  List<Widget Function(List<Habit>, Function(DateTime))> calendarWidgets = [
+    (List<Habit> habits, Function(DateTime) updateSelectedDay) => DayCalendarWidget(habits: habits, updateSelectedDay: updateSelectedDay),
   ];
   ////////////////// CALENDAR STATES
   List<Habit> calendarHabits = HabitManager.getHabits();
+  DateTime selectedDay = DateTime.now();
 
   @override
   Widget build(BuildContext context) {
@@ -127,11 +126,16 @@ class _StatsScreenState extends State<StatsScreen> {
                               ));
                         }),
                   ),
-
                   ],
                 ),
-                  calendarWidgets[modeSelectedIndex](calendarHabits),
-                  const TestWidget(string: "oui")
+                  Container(
+                    child: calendarWidgets[modeSelectedIndex](calendarHabits, (DateTime newSelectedDay){
+                      setState(() {
+                        selectedDay = newSelectedDay;
+                      });
+                    }),
+                  ),
+                  Expanded(child: HabitListWidget(selectedDay: selectedDay))
                   //HabitListWidget(habits: calendarHabits)
                 ]),
             ));
@@ -154,7 +158,9 @@ class HeaderWidget extends StatelessWidget {
 
 class DayCalendarWidget extends StatefulWidget {
   final List<Habit> habits;
-  const DayCalendarWidget({super.key, required this.habits});
+  final Function(DateTime) updateSelectedDay;
+  const DayCalendarWidget({super.key, required this.habits, required this.updateSelectedDay});
+
   @override
   State<StatefulWidget> createState() => _DayCalendarWidgetState();
 }
@@ -162,7 +168,7 @@ class DayCalendarWidget extends StatefulWidget {
 class _DayCalendarWidgetState extends State<DayCalendarWidget> {
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
-  DateTime firstDay = getFirstDayOfMonth(DateTime(1990, DateTime.november));
+  DateTime firstDay = getFirstDayOfMonth(DateTime.now());
   DateTime lastDay = getLastDayOfMonth(DateTime.now());
 
   @override
@@ -174,6 +180,7 @@ class _DayCalendarWidgetState extends State<DayCalendarWidget> {
             onDaySelected: (selectedDay, focusedDay) {
               if (!isSameDay(_selectedDay, selectedDay)) {
                 setState(() {
+                  widget.updateSelectedDay(selectedDay);
                   _selectedDay = selectedDay;
                   _focusedDay = focusedDay;
                 });
@@ -187,7 +194,6 @@ class _DayCalendarWidgetState extends State<DayCalendarWidget> {
             startingDayOfWeek: StartingDayOfWeek.monday,
             firstDay: firstDay,
             lastDay: lastDay,
-            rowHeight: 60,
             calendarStyle: const CalendarStyle(
               outsideDaysVisible: false,
             ),
@@ -195,6 +201,7 @@ class _DayCalendarWidgetState extends State<DayCalendarWidget> {
               weekdayStyle: TextStyle(color: Colors.grey),
               weekendStyle: TextStyle(color: Colors.grey),
             ),
+            rowHeight: 60,
             headerStyle: HeaderStyle(
                 rightChevronVisible:
                     ((DateTime.now().month == _focusedDay.month &&
@@ -251,8 +258,8 @@ class _DayCalendarWidgetState extends State<DayCalendarWidget> {
 
 
 class HabitListWidget extends StatefulWidget{
-  List<Habit> habits;
-  HabitListWidget({super.key, required this.habits});
+  DateTime selectedDay;
+  HabitListWidget({super.key, required this.selectedDay});
   @override
   State<StatefulWidget> createState() => _HabitListWidgetState();
 
@@ -260,15 +267,33 @@ class HabitListWidget extends StatefulWidget{
 class _HabitListWidgetState extends State<HabitListWidget> {
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      itemCount: widget.habits.length,
-      itemBuilder: (BuildContext context, int index) {
-        Habit habit = widget.habits[index];
-        return ListTile(
-          title: Text(habit.title),
-          subtitle: Text(habit.description),
-        );
-      },
+    var notCompletedHabits = HabitManager.getNotCompletedHabitsOnDay(widget.selectedDay);
+    var completedHabits = HabitManager.getCompletedHabitsOnDay(widget.selectedDay);
+    return Row(children:[
+      Expanded(child:
+      ListView.builder(
+        itemCount: completedHabits.length,
+        itemBuilder: (BuildContext context, int index) {
+          Habit habit = completedHabits[index];
+          return ListTile(
+            title:
+            Center(child: Text(habit.title, style: TextStyle(color: Colors.white))),
+          );
+        },
+      )),
+      Expanded(child:
+      ListView.builder(
+        itemCount: notCompletedHabits.length,
+        itemBuilder: (BuildContext context, int index) {
+          Habit habit = notCompletedHabits[index];
+          return ListTile(
+            title:
+                Center(child: Text(habit.title, style: TextStyle(color: uncompleteColor))),
+          );
+        },
+      )),
+
+    ]
     );
   }
 }

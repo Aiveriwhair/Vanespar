@@ -50,6 +50,9 @@ class HabitManager {
   static List<Habit> getCompletedHabitsOnDay(DateTime day) {
     return habits.where((element) => element.completedOnDay(day)).toList();
   }
+  static List<Habit> getNotCompletedHabitsOnDay(DateTime day) {
+    return habits.where((element) => (!element.completedOnDay(day) && element.isCompletableOnDay(day))).toList();
+  }
 
   static Habit getHabitById(String id) {
     return habits.firstWhere((habit) => habit.id == id);
