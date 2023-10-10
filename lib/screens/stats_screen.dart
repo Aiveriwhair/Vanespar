@@ -33,8 +33,6 @@ class _StatsScreenState extends State<StatsScreen> {
   int modeSelectedIndex = 0;
   List<String> calendarView = [
     "Day",
-    "Week",
-    "Month",
   ];
   List<Widget Function(List<Habit>)> calendarWidgets = [
     (List<Habit> habits) => DayCalendarWidget(habits: habits),
@@ -95,7 +93,7 @@ class _StatsScreenState extends State<StatsScreen> {
                 Column(children: [
                   Container(
                     height: 50,
-                    width: 225,
+                    width: 80 * calendarView.length.toDouble(),
                     padding: const EdgeInsets.all(5),
                     alignment: Alignment.center,
                     child: ListView.builder(
