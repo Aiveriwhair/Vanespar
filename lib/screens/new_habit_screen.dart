@@ -16,12 +16,12 @@ bool _isEdit = false;
 String _oldHabitId = "";
 
 bool isTitleExisting(){
-  return HabitManager.getHabits().any((element) => element.title == _titleController.text);
+  return HabitManager.getHabits().any((element) => (element.title == _titleController.text) && _oldHabitId != element.id);
 }
 
 void onCompleteButtonPress(BuildContext context) {
   if (_formKey.currentState!.validate()) {
-    if(isTitleExisting()) return;
+    if(isTitleExisting() || _titleController.text.isEmpty) return;
     String title = _titleController.text;
     String description = _descriptionController.text;
     String frequency = _selectedFrequency;
