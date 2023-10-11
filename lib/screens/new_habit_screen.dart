@@ -10,6 +10,7 @@ final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 final TextEditingController _titleController = TextEditingController();
 final TextEditingController _descriptionController = TextEditingController();
 String _selectedFrequency = 'Daily';
+DateTime _selectedCreationDate = DateTime.now();
 int _selectedColor = HexColor.fromHex("#D3D5AE").value;
 int _selectedIcon = Icons.bed_rounded.codePoint;
 bool _isEdit = false;
@@ -30,7 +31,7 @@ void onCompleteButtonPress(BuildContext context) {
 
     if(!_isEdit) {
       // Create new Habit
-      var newHabit = Habit(title: title, description: description, frequency: frequency, color: colorValue, iconCodePoint: iconPoint);
+      var newHabit = Habit(title: title, description: description, frequency: frequency, color: colorValue, iconCodePoint: iconPoint, creationDate: _selectedCreationDate);
       // Add habit to SharedPreferences using HabitManager
       HabitManager.addHabit(newHabit);
     } else {
@@ -98,10 +99,13 @@ class NewHabitScreen extends StatelessWidget {
                   name: 'Description',
                     isTitle: false
                 ),
-                const Align(
-                  alignment: Alignment.centerLeft,
-                  child: DropDownButton(),
-                ),
+                const Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children:[
+                      DropDownButton(),
+                      DatePickerWidget()
+                    ]
+                  ),
                 const Align(
                   alignment: Alignment.centerLeft,
                   child: Padding(padding: EdgeInsets.all(5),
@@ -255,6 +259,70 @@ class _InputWidgetState extends State<InputWidget> {
   // Sizes
   final double inputLabelSize = 20;
   final double inputTextSize = 16;
+}
+
+
+class DatePickerWidget extends StatefulWidget{
+  const DatePickerWidget({super.key});
+  @override
+  State<StatefulWidget> createState() => _DatePickerWidgetState();
+}
+class _DatePickerWidgetState extends State<DatePickerWidget>{
+
+  DateTime selectedDate = DateTime.now();
+
+  Future<void> _selectDate(BuildContext context) async {
+    DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: selectedDate,
+      firstDate: DateTime.now(),
+      lastDate: DateTime(2100),
+    );
+    if (pickedDate != null && pickedDate != selectedDate) {
+      setState(() {
+        selectedDate = pickedDate;
+        _selectedCreationDate = pickedDate;
+      });
+    }
+  }
+  String _addLeadingZero(int number) {
+    if (number < 10) {
+      return '0$number';
+    }
+    return number.toString();
+  }
+  String dateTimeToDateString(DateTime day){
+    return "${day.year}-${_addLeadingZero(day.month)}-${_addLeadingZero(day.day)}";
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 32,
+      padding: const EdgeInsets.all(0),
+      margin: const EdgeInsets.all(0),
+      decoration: const BoxDecoration(
+        border: Border(bottom: BorderSide(color: Colors.white, width: 2.0)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          const Icon(Icons.calendar_month_rounded,
+              color: Colors.white),
+          ElevatedButton(
+            style: ButtonStyle(
+              backgroundColor: MaterialStateProperty.all<Color>(Colors.black),
+            ),
+            onPressed: () => _selectDate(context),
+            child: Text(
+              dateTimeToDateString(selectedDate) ?? "",
+              style: const TextStyle(fontSize: 16),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 
