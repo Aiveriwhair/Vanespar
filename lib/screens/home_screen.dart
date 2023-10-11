@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:vanespar/logic/habit.dart';
 import 'package:vanespar/logic/habit_manager.dart';
 import 'package:vanespar/screens/new_habit_screen.dart';
@@ -20,6 +21,7 @@ class HomeScreen extends StatefulWidget{
 }
 class _HomeScreenState extends State<HomeScreen> {
   bool seeAllHabits = false;
+  bool isStatsLocked = HabitManager.getHabits().isEmpty;
 
   void onNewHabitPress(BuildContext context) {
     Navigator.of(context).push(
@@ -41,7 +43,11 @@ class _HomeScreenState extends State<HomeScreen> {
       seeAllHabits = !seeAllHabits;
     });
   }
-
+  void updateStatsLockedState(){
+    setState(() {
+      isStatsLocked = HabitManager.getHabits().isEmpty;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -49,23 +55,25 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         backgroundColor: Colors.black,
         title: CustomHeader(
+            isStatsLocked: isStatsLocked,
           onNewHabitPress: () => onNewHabitPress(context),
           onStatsPress: () => onStatsPress(context),
           onCheckPress: () => onCheckPress(),
         ),
       ),
 
-      /// !!! Needs to take seeAllHabits as parameter !!!
-      body: const MyStatefulListWidget(),
+
+      body: MyStatefulListWidget(updateStatsLockedState: () => updateStatsLockedState()),
     );
   }
 }
 
 class CustomHeader extends StatefulWidget{
-  const CustomHeader({super.key, required this.onNewHabitPress, required this.onStatsPress, required this.onCheckPress});
+  CustomHeader({super.key, required this.onNewHabitPress, required this.onStatsPress, required this.onCheckPress, required this.isStatsLocked});
   final VoidCallback onNewHabitPress;
   final VoidCallback onStatsPress;
   final VoidCallback onCheckPress;
+  bool isStatsLocked = false;
   @override
   State<StatefulWidget> createState() => _CustomHeaderState();
 }
@@ -156,8 +164,8 @@ class _CustomHeaderState extends State<CustomHeader> {
                 children: <Widget>[
                   IconButton(
                     icon: Icon(Icons.leaderboard,
-                        color: Colors.white, size: iconSize),
-                    onPressed: widget.onStatsPress,
+                        color: widget.isStatsLocked ? Colors.grey : Colors.white, size: iconSize),
+                    onPressed: widget.isStatsLocked ? null : widget.onStatsPress,
                   ),
                   IconButton(
                     icon: Icon(Icons.add, color: Colors.white, size: iconSize),
@@ -377,8 +385,8 @@ class _CustomListItemState extends State<CustomListItem> {
 }
 
 class MyStatefulListWidget extends StatefulWidget {
-  const MyStatefulListWidget({super.key});
-
+  const MyStatefulListWidget({super.key, required this.updateStatsLockedState});
+  final VoidCallback updateStatsLockedState;
   Widget scaleUpDecorator(
       Widget child, int index, Animation<double> animation) {
     return AnimatedBuilder(
@@ -410,10 +418,12 @@ class _MyStatefulListWidgetState extends State<MyStatefulListWidget> {
     return Container(
       color: Colors.black,
       child: StreamBuilder<List<Habit>>(
-        stream: HabitManager.habitsStream, // Stream of habits
+        stream: HabitManager.habitsStream,
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            // ReorderableListView with CustomListItem widgets
+            SchedulerBinding.instance?.addPostFrameCallback((_) {
+              widget.updateStatsLockedState();
+            });
             return ReorderableListView(
               onReorder: (oldIndex, newIndex) =>
                   HabitManager.reorderHabit(oldIndex, newIndex),
@@ -442,12 +452,5 @@ class _MyStatefulListWidgetState extends State<MyStatefulListWidget> {
         }
       )
     );
-  }
-
-  void addHabit() {
-    HabitManager.addHabit(Habit(
-        title: "Title2",
-        color: Colors.orange.value,
-        iconCodePoint: Icons.house.codePoint));
   }
 }
