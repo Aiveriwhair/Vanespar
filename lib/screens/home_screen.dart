@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:vanespar/logic/habit.dart';
 import 'package:vanespar/logic/habit_manager.dart';
 import 'package:vanespar/screens/new_habit_screen.dart';
-import 'package:vanespar/screens/parameters_screen.dart';
 import 'package:vanespar/screens/stats_screen.dart';
 import 'package:vanespar/screens/details_screen.dart';
 
@@ -10,30 +9,40 @@ import 'dart:ui';
 
 import '../main.dart';
 
-void onNewHabitPress(BuildContext context) {
-  Navigator.of(context).push(
-    MaterialPageRoute(
-      builder: (context) => NewHabitScreen(),
-    ),
-  );
-}
+final Color appBlue = HexColor.fromHex("#84D4FF");
+final Color appPink = HexColor.fromHex("#DC8BFC");
 
-void onStatsPress(BuildContext context) {
-  Navigator.push(
-    context,
-    MaterialPageRoute(builder: (context) => const StatsScreen()),
-  );
-}
 
-void onParameterPress(BuildContext context) {
-  Navigator.push(
-    context,
-    MaterialPageRoute(builder: (context) => const ParametersScreen()),
-  );
-}
-
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget{
   const HomeScreen({super.key});
+  @override
+  State<StatefulWidget> createState() => _HomeScreenState();
+}
+class _HomeScreenState extends State<HomeScreen> {
+  bool seeAllHabits = false;
+
+  void onNewHabitPress(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => NewHabitScreen(),
+      ),
+    );
+  }
+
+  void onStatsPress(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const StatsScreen()),
+    );
+  }
+
+  void onCheckPress() {
+    setState(() {
+      seeAllHabits = !seeAllHabits;
+    });
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -42,24 +51,30 @@ class HomeScreen extends StatelessWidget {
         title: CustomHeader(
           onNewHabitPress: () => onNewHabitPress(context),
           onStatsPress: () => onStatsPress(context),
-          onParameterPress: () => onParameterPress(context),
+          onCheckPress: () => onCheckPress(),
         ),
       ),
+
+      /// !!! Needs to take seeAllHabits as parameter !!!
       body: const MyStatefulListWidget(),
     );
   }
 }
 
-class CustomHeader extends StatelessWidget {
+class CustomHeader extends StatefulWidget{
+  const CustomHeader({super.key, required this.onNewHabitPress, required this.onStatsPress, required this.onCheckPress});
   final VoidCallback onNewHabitPress;
   final VoidCallback onStatsPress;
-  final VoidCallback onParameterPress;
+  final VoidCallback onCheckPress;
+  @override
+  State<StatefulWidget> createState() => _CustomHeaderState();
+}
+class _CustomHeaderState extends State<CustomHeader> {
+  bool isChecked = false;
 
-  const CustomHeader(
-      {super.key,
-      required this.onNewHabitPress,
-      required this.onStatsPress,
-      required this.onParameterPress});
+  Color getCheckboxColor(Set<MaterialState> states) {
+    return isChecked ? appPink : appBlue;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -75,21 +90,30 @@ class CustomHeader extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: <Widget>[
                   const SizedBox(width: 10),
-                  ShaderMask(
-                    blendMode: BlendMode.srcIn,
-                    shaderCallback: (Rect bounds) => LinearGradient(
-                      stops: const [.3, .7],
-                      colors: [
-                        HexColor.fromHex("#DC8BFC"),
-                        HexColor.fromHex("#84D4FF"),
-                      ],
-                    ).createShader(bounds),
-                    child: IconButton(
-                      icon: Icon(Icons.settings,
-                          color: Colors.white, size: iconSize),
-                      onPressed: onParameterPress,
+                  Container(
+                    width: 30,
+                    height: 30,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(15),
+                      color: getCheckboxColor(<MaterialState>{}),
                     ),
-                  ),
+
+                    child: Checkbox(
+                      side: BorderSide(
+                        color:  getCheckboxColor(<MaterialState>{}),
+                        style: BorderStyle.none
+                      ),
+                      value: isChecked,
+                      fillColor: MaterialStateProperty.resolveWith(getCheckboxColor),
+                      checkColor: Colors.white,
+                      onChanged: (bool? value) {
+                        widget.onCheckPress();
+                        setState(() {
+                          isChecked = value ?? false;
+                        });
+                      },
+                    ),
+                  )
                 ],
               ),
               ShaderMask(
@@ -133,11 +157,11 @@ class CustomHeader extends StatelessWidget {
                   IconButton(
                     icon: Icon(Icons.leaderboard,
                         color: Colors.white, size: iconSize),
-                    onPressed: onStatsPress,
+                    onPressed: widget.onStatsPress,
                   ),
                   IconButton(
                     icon: Icon(Icons.add, color: Colors.white, size: iconSize),
-                    onPressed: onNewHabitPress,
+                    onPressed: widget.onNewHabitPress,
                   ),
                   const SizedBox(width: 10),
                 ],
