@@ -43,6 +43,21 @@ class HabitManager {
     return habits;
   }
 
+  static DateTime? getFirstCreatedHabitDay() {
+    if (habits.isNotEmpty) {
+      Habit? firstHabit = habits.reduce((current, next) {
+        return current.creationDate.isBefore(next.creationDate) ? current : next;
+      });
+
+      return DateTime(
+          firstHabit.creationDate.year,
+          firstHabit.creationDate.month,
+          firstHabit.creationDate.day);
+    } else {
+      return null;
+    }
+  }
+
   static List<Habit> getCompletableHabitsOnDay(DateTime day) {
     return habits.where((element) => element.isCompletableOnDay(day)).toList();
   }

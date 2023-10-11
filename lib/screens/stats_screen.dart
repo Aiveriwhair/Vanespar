@@ -85,8 +85,9 @@ class _StatsScreenState extends State<StatsScreen> {
                         return DropdownMenuItem<String>(
                           value: value,
                           child: Text(
-                            value,
+                            value.length >= 10 ? "${value.substring(0, 9)}..." : value,
                             style: const TextStyle(color: Colors.white),
+                            overflow: TextOverflow.ellipsis,
                           ),
                         );
                       }).toList(),
@@ -160,7 +161,6 @@ class DayCalendarWidget extends StatefulWidget {
   final List<Habit> habits;
   final Function(DateTime) updateSelectedDay;
   const DayCalendarWidget({super.key, required this.habits, required this.updateSelectedDay});
-
   @override
   State<StatefulWidget> createState() => _DayCalendarWidgetState();
 }
@@ -168,11 +168,15 @@ class DayCalendarWidget extends StatefulWidget {
 class _DayCalendarWidgetState extends State<DayCalendarWidget> {
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
-  DateTime firstDay = getFirstDayOfMonth(DateTime.now());
+  DateTime firstDay = getFirstDayOfMonth(HabitManager.getFirstCreatedHabitDay() ?? DateTime.now());
   DateTime lastDay = getLastDayOfMonth(DateTime.now());
 
   @override
   Widget build(BuildContext context) {
+    bool isLeftChevronVisible() {
+      DateTime firstDayOfNextMonth = DateTime(firstDay.year, firstDay.month + 1, 1);
+      return _focusedDay.isAfter(firstDayOfNextMonth) || _focusedDay.isAtSameMomentAs(firstDayOfNextMonth);
+    }
     return SingleChildScrollView(
         child: TableCalendar(
             focusedDay: _focusedDay,
@@ -203,6 +207,7 @@ class _DayCalendarWidgetState extends State<DayCalendarWidget> {
             ),
             rowHeight: 60,
             headerStyle: HeaderStyle(
+              leftChevronVisible:isLeftChevronVisible(),
                 rightChevronVisible:
                     ((DateTime.now().month == _focusedDay.month &&
                             DateTime.now().year == _focusedDay.year)
@@ -210,7 +215,7 @@ class _DayCalendarWidgetState extends State<DayCalendarWidget> {
                         : true),
                 formatButtonVisible: false,
                 formatButtonShowsNext: false,
-                titleCentered: false,
+                titleCentered: true,
                 titleTextStyle: const TextStyle(color: Colors.white)),
             calendarBuilders:
                 CalendarBuilders(todayBuilder: (context, day, day2) {
@@ -276,8 +281,13 @@ class _HabitListWidgetState extends State<HabitListWidget> {
         itemBuilder: (BuildContext context, int index) {
           Habit habit = completedHabits[index];
           return ListTile(
-            title:
-            Center(child: Text(habit.title, style: TextStyle(color: Colors.white))),
+            title: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 5),
+                child: Text(
+                  habit.title,
+                  style: const TextStyle(color: Colors.white),
+                  overflow: TextOverflow.ellipsis,
+                )),
           );
         },
       )),
@@ -288,11 +298,16 @@ class _HabitListWidgetState extends State<HabitListWidget> {
           Habit habit = notCompletedHabits[index];
           return ListTile(
             title:
-                Center(child: Text(habit.title, style: TextStyle(color: uncompleteColor))),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 5),
+                    child: Text(
+                    habit.title,
+                    style: const TextStyle(color: Colors.red),
+                    overflow: TextOverflow.ellipsis,
+                )),
           );
         },
       )),
-
     ]
     );
   }
