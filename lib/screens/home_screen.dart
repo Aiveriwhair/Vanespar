@@ -63,7 +63,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
 
 
-      body: MyStatefulListWidget(updateStatsLockedState: () => updateStatsLockedState()),
+      body: MyStatefulListWidget(updateStatsLockedState: () => updateStatsLockedState(), seeAllHabits: seeAllHabits),
     );
   }
 }
@@ -177,9 +177,16 @@ class _CustomHeaderState extends State<CustomHeader> {
             ]));
   }
 }
+/*
+class MyListWidget extends StatefulWidget{
+  final bool seeAllHabits;
+  const MyListWidget({super.key, required this.seeAllHabits});
 
-class MyListWidget extends StatelessWidget {
-  const MyListWidget({super.key});
+  @override
+  State<StatefulWidget> createState() => _MyListWidgetState();
+}
+
+class _MyListWidgetState extends State<MyListWidget> {
 
   Widget scaleUpDecorator(
       Widget child, int index, Animation<double> animation) {
@@ -219,6 +226,7 @@ class MyListWidget extends StatelessWidget {
         color: Color(habit.color),
       ));
     }
+    if(widget.seeAllHabits){
     for (var habit in unCompletable) {
       items.add(CustomListItem(
         isCompletable: false,
@@ -232,7 +240,7 @@ class MyListWidget extends StatelessWidget {
         color: Color(habit.color),
       ));
     }
-
+    }
     return Container(
         color: Colors.black,
         child: ReorderableListView(
@@ -242,7 +250,7 @@ class MyListWidget extends StatelessWidget {
           children: items,
         ));
   }
-}
+}*/
 
 class CustomListItem extends StatefulWidget {
   String id;
@@ -403,8 +411,9 @@ class _CustomListItemState extends State<CustomListItem> {
 }
 
 class MyStatefulListWidget extends StatefulWidget {
-  const MyStatefulListWidget({super.key, required this.updateStatsLockedState});
+  const MyStatefulListWidget({super.key, required this.updateStatsLockedState, required this.seeAllHabits});
   final VoidCallback updateStatsLockedState;
+  final bool seeAllHabits;
   Widget scaleUpDecorator(
       Widget child, int index, Animation<double> animation) {
     return AnimatedBuilder(
@@ -447,6 +456,8 @@ class _MyStatefulListWidgetState extends State<MyStatefulListWidget> {
                   HabitManager.reorderHabit(oldIndex, newIndex),
               proxyDecorator: widget.scaleUpDecorator,
               children: snapshot.data!
+                  .where((habit) =>
+                      habit.isCompletableOnDay(DateTime.now()) || widget.seeAllHabits)
                   .map((habit) => CustomListItem(
                         id: habit.id,
                         title: habit.title,
@@ -457,9 +468,7 @@ class _MyStatefulListWidgetState extends State<MyStatefulListWidget> {
                         color: Color(habit.color),
                         frequency: habit.frequency,
                         isCompletable: habit.isCompletableOnDay(DateTime.now()),
-                        key: ValueKey<String>(habit.id),
-                      ))
-                  .toList(),
+                        key: ValueKey<String>(habit.id))).toList(),
             );
           } else if (snapshot.hasError) {
             // Handle error
