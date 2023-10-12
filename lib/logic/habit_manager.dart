@@ -42,6 +42,9 @@ class HabitManager {
   static List<Habit> getHabits() {
     return habits;
   }
+  static (List<Habit>,List<Habit>) getHabitsOnDay(DateTime day) {
+    return (getCompletableHabitsOnDay(day), getNotCompletableHabitsOnDay(day));
+  }
 
   static DateTime? getFirstCreatedHabitDay() {
     if (habits.isNotEmpty) {
@@ -56,6 +59,10 @@ class HabitManager {
     } else {
       return null;
     }
+  }
+
+  static List<Habit> getNotCompletableHabitsOnDay(DateTime day) {
+    return habits.where((element) => !element.isCompletableOnDay(day)).toList();
   }
 
   static List<Habit> getCompletableHabitsOnDay(DateTime day) {

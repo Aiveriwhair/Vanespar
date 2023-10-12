@@ -204,10 +204,24 @@ class MyListWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     List<Widget> items = [];
-    for (var habit in HabitManager.getHabits()) {
+    var (completable, unCompletable) = HabitManager.getHabitsOnDay(DateTime.now());
+    for (var habit in completable) {
       items.add(CustomListItem(
+        isCompletable: true,
+        id: habit.id,
+        title: habit.title,
+        description: habit.description,
+        isCompleted: habit.isCompletedToday(),
+        iconData: habit.getIconData(),
+        frequency: habit.frequency,
+        lastDaysCompletion: habit.getLastDaysCompletion(6),
+        color: Color(habit.color),
+      ));
+    }
+    for (var habit in unCompletable) {
+      items.add(CustomListItem(
+        isCompletable: false,
         id: habit.id,
         title: habit.title,
         description: habit.description,
@@ -236,12 +250,14 @@ class CustomListItem extends StatefulWidget {
   String title;
   String description;
   bool isCompleted;
+  bool isCompletable;
   String frequency;
   IconData iconData;
   List<bool> lastDaysCompletion;
 
   CustomListItem({
     super.key,
+    required this.isCompletable,
     required this.id,
     required this.title,
     required this.description,
@@ -292,16 +308,16 @@ class _CustomListItemState extends State<CustomListItem> {
                         decoration: BoxDecoration(
                           borderRadius:
                             const BorderRadius.all(Radius.circular(10)),
-                          color: widget.color,
+                          color: widget.isCompletable ? widget.color : Colors.black45,
                         ),
                         width: iconSize,
                         height: iconSize,
                         child: Icon(
                           widget.iconData,
-                          color: Colors.white,
+                          color: widget.isCompletable ? Colors.white : unselectedColor,
                         )
                       ),
-                      const SizedBox(width: 5),
+                      const SizedBox(width: 20),
                       ConstrainedBox(
                         constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width - 150),
                         child: Column(
@@ -309,12 +325,12 @@ class _CustomListItemState extends State<CustomListItem> {
                           children: [
                             Text(widget.title,
                                 style: TextStyle(
-                                    color: Colors.white, fontSize: titleSize)),
+                                    color: widget.isCompletable ? Colors.white : Colors.grey, fontSize: titleSize)),
                             Text(widget.description,
                                 overflow: TextOverflow.ellipsis,
                                 maxLines: 1,
                                 style: TextStyle(
-                                    color: Colors.white,
+                                    color: widget.isCompletable ? Colors.white : Colors.grey,
                                     fontSize: descriptionSize))
                           ],
                         ),
@@ -325,17 +341,19 @@ class _CustomListItemState extends State<CustomListItem> {
                       decoration: BoxDecoration(
                         borderRadius:
                             const BorderRadius.all(Radius.circular(10)),
-                        color: (widget.isCompleted
+                        color: widget.isCompletable ? (widget.isCompleted
                             ? widget.color
-                            : unselectedColor),
+                            : unselectedColor) : Colors.black45,
                       ),
                       width: iconSize,
                       height: iconSize,
                       child: IconButton(
                         padding: EdgeInsets.zero,
                         iconSize: 25,
-                        icon: const Icon(Icons.check, color: Colors.white),
-                        onPressed: onCompleteButtonPress,
+                        icon: Icon(Icons.check,
+                            color: widget.isCompletable ? Colors.white : unselectedColor
+                        ),
+                        onPressed: widget.isCompletable ? onCompleteButtonPress : null,
                         style: const ButtonStyle(),
                       ))
                 ],
@@ -438,6 +456,7 @@ class _MyStatefulListWidgetState extends State<MyStatefulListWidget> {
                         lastDaysCompletion: habit.getLastDaysCompletion(6),
                         color: Color(habit.color),
                         frequency: habit.frequency,
+                        isCompletable: habit.isCompletableOnDay(DateTime.now()),
                         key: ValueKey<String>(habit.id),
                       ))
                   .toList(),
