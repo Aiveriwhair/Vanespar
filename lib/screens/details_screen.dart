@@ -53,15 +53,18 @@ void showDetailsDialog(BuildContext context, String habitId) {
                       )
                     ),
                     const SizedBox(width: 5),
-                    Text(
-                      habit.title,
-                      style: const TextStyle(
-                        fontSize: 30,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white
+                    Expanded(
+                      child: Text(
+                        habit.title,
+                        maxLines: 2,
+                        style: const TextStyle(
+                          overflow: TextOverflow.ellipsis,
+                            fontSize: 30,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white
+                        ),
                       ),
                     ),
-                    const Spacer(),
                     IconButton(
                       onPressed: (){
                         Navigator.pop(context);
@@ -77,9 +80,11 @@ void showDetailsDialog(BuildContext context, String habitId) {
                   margin: const EdgeInsets.only(top: 10, bottom: 10),
                   child: Text(
                     habit.description,
+                    maxLines: 5,
                     style: const TextStyle(
                       fontSize: 20,
-                      color: Colors.white
+                      color: Colors.white,
+                      overflow: TextOverflow.ellipsis
                     ),
                   ),
                 ),

@@ -272,10 +272,9 @@ class CustomListItem extends StatefulWidget {
     required this.isCompleted,
     required this.iconData,
     required this.frequency,
-    required List<bool> lastDaysCompletion,
+    required this.lastDaysCompletion,
     required this.color,
-  }) : lastDaysCompletion = [...lastDaysCompletion, isCompleted];
-
+  });
   @override
   State<CustomListItem> createState() => _CustomListItemState();
 }
@@ -286,8 +285,6 @@ class _CustomListItemState extends State<CustomListItem> {
   void onCompleteButtonPress() {
     setState(() {
       widget.isCompleted = !widget.isCompleted;
-      widget.lastDaysCompletion.removeLast();
-      widget.lastDaysCompletion.add(widget.isCompleted);
       HabitManager.setHabitLastDayCompletion(widget.id, widget.isCompleted);
     });
   }
@@ -302,6 +299,7 @@ class _CustomListItemState extends State<CustomListItem> {
         color: Colors.black,
         padding: const EdgeInsets.fromLTRB(10, 4, 10, 4),
         child: Container(
+          height: 100,
             padding: const EdgeInsets.all(10.0),
             decoration: BoxDecoration(
                 borderRadius: const BorderRadius.all(Radius.circular(15)),
@@ -333,6 +331,7 @@ class _CustomListItemState extends State<CustomListItem> {
                           children: [
                             Text(widget.title,
                                 style: TextStyle(
+                                    overflow: TextOverflow.ellipsis,
                                     color: widget.isCompletable ? Colors.white : Colors.grey, fontSize: titleSize)),
                             Text(widget.description,
                                 overflow: TextOverflow.ellipsis,
@@ -397,14 +396,11 @@ class _CustomListItemState extends State<CustomListItem> {
       )
     );
   }
-
   // Colors
   final Color backGroundColor = HexColor.fromHex("#151515");
   final Color unselectedColor = HexColor.fromHex("#353535");
-
   // Sizes
   final double iconSize = 40;
-
   // Fonts
   final double titleSize = 24;
   final double descriptionSize = 12;
@@ -434,7 +430,6 @@ class MyStatefulListWidget extends StatefulWidget {
       child: child,
     );
   }
-
   @override
   State<MyStatefulListWidget> createState() => _MyStatefulListWidgetState();
 }
@@ -464,7 +459,7 @@ class _MyStatefulListWidgetState extends State<MyStatefulListWidget> {
                         description: habit.description,
                         isCompleted: habit.isCompletedToday(),
                         iconData: habit.getIconData(),
-                        lastDaysCompletion: habit.getLastDaysCompletion(6),
+                        lastDaysCompletion: habit.getLastCompletions(7),
                         color: Color(habit.color),
                         frequency: habit.frequency,
                         isCompletable: habit.isCompletableOnDay(DateTime.now()),

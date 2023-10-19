@@ -44,22 +44,38 @@ class Habit {
     return IconData(iconCodePoint, fontFamily: "MaterialICons");
   }
 
-  List<bool> getLastDaysCompletion(int numDays) {
+  List<bool> getLastCompletions(int numDays) {
     DateTime today = DateTime.now();
-    DateTime lastDaysStart = today.subtract(Duration(days: numDays));
+    List<DateTime> completableDates = [];
 
-    List<bool> completions = [];
-
-    for (int i = 0; i < numDays; i++) {
-      DateTime currentDate = lastDaysStart.add(Duration(days: i));
-      bool isCompletedOnDate = completionDates.any((date) =>
-          date.year == currentDate.year &&
-          date.month == currentDate.month &&
-          date.day == currentDate.day);
-      completions.add(isCompletedOnDate);
+    switch (frequency) {
+      case "Daily":
+        for (int i = 0; i < numDays; i++) {
+          completableDates.add(today.subtract(Duration(days: i)));
+        }
+        break;
+      case "Weekly":
+        for (int i = 0; i < numDays; i++) {
+          DateTime day = today.subtract(Duration(days: i));
+          if (day.weekday == creationDate.weekday) {
+            completableDates.add(day);
+          }
+        }
+        break;
+      case "Monthly":
+        for (int i = 0; i < numDays; i++) {
+          DateTime day = DateTime(today.year, today.month - i, today.day);
+          if (day.day == creationDate.day) {
+            completableDates.add(day);
+          }
+        }
+        break;
+      default:
+        throw Exception("Invalid frequency");
     }
 
-    return completions;
+    List<bool> completions = completableDates.map((date) => isCompletedOnDay(date)).toList();
+    return completions.reversed.toList();
   }
 
   bool completedOnDay(DateTime day) {
