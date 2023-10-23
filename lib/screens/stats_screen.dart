@@ -281,6 +281,10 @@ class _HabitListWidgetState extends State<HabitListWidget> {
         itemBuilder: (BuildContext context, int index) {
           Habit habit = completedHabits[index];
           return ListTile(
+            onTap: (){
+              HabitManager.setHabitCompletion(habit.id, !habit.isCompletedOnDay(widget.selectedDay), widget.selectedDay);
+              setState(() {});
+            },
             title: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 5),
                 child: Text(
@@ -297,6 +301,10 @@ class _HabitListWidgetState extends State<HabitListWidget> {
         itemBuilder: (BuildContext context, int index) {
           Habit habit = notCompletedHabits[index];
           return ListTile(
+            onTap: (){
+              HabitManager.setHabitCompletion(habit.id, !habit.isCompletedOnDay(widget.selectedDay), widget.selectedDay);
+              setState(() {});
+            },
             title:
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 5),
