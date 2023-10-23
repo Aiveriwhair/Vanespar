@@ -100,6 +100,16 @@ class HabitManager {
     _saveHabitsToPrefs();
   }
 
+  static void setHabitCompletion(String habitId, bool completed, DateTime day){
+    int index = habits.indexWhere((element) => element.id == habitId);
+    if (habits[index].isCompletedOnDay(day) && !completed) {
+      habits[index].completionDates.removeWhere((element) => element.year == day.year && element.month == day.month && element.day == day.day);
+    } else if (!habits[index].isCompletedToday() && completed) {
+      habits[index].completionDates.add(day);
+    }
+    _saveHabitsToPrefs();
+  }
+
   // Edit habit based on id
   static void editHabit(String id, String title, String description,
       String frequency, int colorValue, int iconPoint) {
