@@ -35,7 +35,7 @@ void onCompleteButtonPress(BuildContext context) {
       // Add habit to SharedPreferences using HabitManager
       HabitManager.addHabit(newHabit);
     } else {
-      HabitManager.editHabit(_oldHabitId, title, description, frequency, colorValue, iconPoint);
+      HabitManager.editHabit(_oldHabitId, title, description, frequency, colorValue, iconPoint, _selectedCreationDate);
     }
     Navigator.pop(context);
   }
@@ -136,6 +136,7 @@ class NewHabitScreen extends StatelessWidget {
     _selectedFrequency = 'Daily';
     _selectedIcon = Icons.bed_rounded.codePoint;
     _selectedColor = HexColor.fromHex("#D3D5AE").value;
+    _selectedCreationDate = DateTime.now();
   }
 
   NewHabitScreen.edit(Habit habit, {super.key}) {
@@ -146,6 +147,7 @@ class NewHabitScreen extends StatelessWidget {
     _selectedFrequency = habit.frequency;
     _selectedIcon = habit.iconCodePoint;
     _selectedColor = habit.color;
+    _selectedCreationDate = habit.creationDate;
   }
 }
 
@@ -269,18 +271,15 @@ class DatePickerWidget extends StatefulWidget{
 }
 class _DatePickerWidgetState extends State<DatePickerWidget>{
 
-  DateTime selectedDate = DateTime.now();
-
   Future<void> _selectDate(BuildContext context) async {
     DateTime? pickedDate = await showDatePicker(
       context: context,
-      initialDate: selectedDate,
+      initialDate: _selectedCreationDate,
       firstDate: DateTime.now(),
       lastDate: DateTime(2100),
     );
-    if (pickedDate != null && pickedDate != selectedDate) {
+    if (pickedDate != null && pickedDate != _selectedCreationDate) {
       setState(() {
-        selectedDate = pickedDate;
         _selectedCreationDate = pickedDate;
       });
     }
@@ -315,7 +314,7 @@ class _DatePickerWidgetState extends State<DatePickerWidget>{
             ),
             onPressed: () => _selectDate(context),
             child: Text(
-              dateTimeToDateString(selectedDate) ?? "",
+              dateTimeToDateString(_selectedCreationDate) ?? "",
               style: const TextStyle(fontSize: 16),
             ),
           ),
