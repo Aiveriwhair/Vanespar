@@ -5,13 +5,9 @@ import 'package:vanespar/logic/habit_manager.dart';
 import 'package:vanespar/screens/new_habit_screen.dart';
 import 'package:vanespar/screens/stats_screen.dart';
 import 'package:vanespar/screens/details_screen.dart';
+import 'package:vanespar/assets/colors.dart' as app_colors;
 
 import 'dart:ui';
-
-import '../main.dart';
-
-final Color appBlue = HexColor.fromHex("#84D4FF");
-final Color appPink = HexColor.fromHex("#DC8BFC");
 
 
 class HomeScreen extends StatefulWidget{
@@ -81,7 +77,7 @@ class _CustomHeaderState extends State<CustomHeader> {
   bool isChecked = false;
 
   Color getCheckboxColor(Set<MaterialState> states) {
-    return isChecked ? appPink : appBlue;
+    return isChecked ? app_colors.appPink : app_colors.appBlue;
   }
 
   @override
@@ -127,10 +123,10 @@ class _CustomHeaderState extends State<CustomHeader> {
               ShaderMask(
                 blendMode: BlendMode.srcIn,
                 shaderCallback: (Rect bounds) => LinearGradient(
-                  stops: const [.3, .7],
+                  stops: const [0, 0],
                   colors: [
-                    HexColor.fromHex("#84D4FF"),
-                    HexColor.fromHex("#DC8BFC"),
+                    app_colors.appBlue,
+                    app_colors.appPink,
                   ],
                 ).createShader(bounds),
                 child: const Row(
@@ -397,8 +393,8 @@ class _CustomListItemState extends State<CustomListItem> {
     );
   }
   // Colors
-  final Color backGroundColor = HexColor.fromHex("#151515");
-  final Color unselectedColor = HexColor.fromHex("#353535");
+  final Color backGroundColor = app_colors.HexColor.fromHex("#151515");
+  final Color unselectedColor = app_colors.HexColor.fromHex("#353535");
   // Sizes
   final double iconSize = 40;
   // Fonts

@@ -3,18 +3,18 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:vanespar/logic/habit.dart';
 import 'package:vanespar/logic/habit_manager.dart';
-
-import '../main.dart';
+import 'package:vanespar/assets/colors.dart' as app_colors;
 
 final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 final TextEditingController _titleController = TextEditingController();
 final TextEditingController _descriptionController = TextEditingController();
 String _selectedFrequency = 'Daily';
 DateTime _selectedCreationDate = DateTime.now();
-int _selectedColor = HexColor.fromHex("#D3D5AE").value;
+int _selectedColor = app_colors.HexColor.fromHex("#D3D5AE").value;
 int _selectedIcon = Icons.bed_rounded.codePoint;
 bool _isEdit = false;
 String _oldHabitId = "";
+
 
 bool isTitleExisting(){
   return HabitManager.getHabits().any((element) => (element.title == _titleController.text) && _oldHabitId != element.id);
@@ -135,7 +135,7 @@ class NewHabitScreen extends StatelessWidget {
     _descriptionController.text = "";
     _selectedFrequency = 'Daily';
     _selectedIcon = Icons.bed_rounded.codePoint;
-    _selectedColor = HexColor.fromHex("#D3D5AE").value;
+    _selectedColor = app_colors.HexColor.fromHex("#D3D5AE").value;
   }
 
   NewHabitScreen.edit(Habit habit, {super.key}) {
@@ -167,7 +167,7 @@ class Header extends StatelessWidget {
                     textAlign: TextAlign.center,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                        color: HexColor.fromHex("#DC8BFC"),
+                        color: app_colors.appPink,
                         fontSize: 29,
                         fontWeight: FontWeight.bold,
                         letterSpacing: 1.2),
@@ -177,7 +177,7 @@ class Header extends StatelessWidget {
                     textAlign: TextAlign.center,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                        color: HexColor.fromHex("#84D4FF"),
+                        color: app_colors.appBlue,
                         fontSize: 29,
                         fontWeight: FontWeight.bold,
                         letterSpacing: 1.2),
@@ -420,7 +420,7 @@ class _IconGridState extends State<IconGrid> {
         itemBuilder: (context, index) {
           return Container(
             decoration: BoxDecoration(
-                border: Border.all(width:2,color:  (selectedIndex == index ? Colors.white : Colors.black)),
+                border: Border.all(width:2,color:  (selectedIndex == index ? app_colors.appPink : Colors.black)),
                 borderRadius: BorderRadius.circular(25)),
               child: GestureDetector(
                 onTap: () {
@@ -468,7 +468,7 @@ class _ColorGridState extends State<ColorGrid> {
 
   @override
   Widget build(BuildContext context) {
-    int selectedIndex = colorsHexs.indexWhere((element) => HexColor.fromHex(element).value == _selectedColor);
+    int selectedIndex = colorsHexs.indexWhere((element) => app_colors.HexColor.fromHex(element).value == _selectedColor);
     return GridView.builder(
         itemCount: colorsHexs.length,
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 7),
@@ -477,15 +477,15 @@ class _ColorGridState extends State<ColorGrid> {
             width: 20,
             height: 20,
               decoration: BoxDecoration(
-                  color: HexColor.fromHex(colorsHexs[index]),
-                  border: Border.all(width:2, color:  (selectedIndex == index ? Colors.white : Colors.black)),
+                  color: app_colors.HexColor.fromHex(colorsHexs[index]),
+                  border: Border.all(width:2, color:  (selectedIndex == index ? app_colors.appPink : Colors.black)),
                   borderRadius: BorderRadius.circular(25)),
               child: GestureDetector(
                   onTap: () {
                     setState(() {
                       selectedIndex = index;
                     });
-                    _selectedColor = HexColor.fromHex(colorsHexs[index]).value;
+                    _selectedColor = app_colors.HexColor.fromHex(colorsHexs[index]).value;
                   },
           ));
         }

@@ -52,7 +52,7 @@ void showDetailsDialog(BuildContext context, String habitId) {
                         color: Colors.white,
                       )
                     ),
-                    const SizedBox(width: 5),
+                    const SizedBox(width: 10),
                     Expanded(
                       child: Text(
                         habit.title,
