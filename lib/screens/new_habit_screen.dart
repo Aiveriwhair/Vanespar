@@ -15,27 +15,34 @@ int _selectedIcon = Icons.bed_rounded.codePoint;
 bool _isEdit = false;
 String _oldHabitId = "";
 
-
-bool isTitleExisting(){
-  return HabitManager.getHabits().any((element) => (element.title == _titleController.text) && _oldHabitId != element.id);
+bool isTitleExisting() {
+  return HabitManager.getHabits().any((element) =>
+      (element.title == _titleController.text) && _oldHabitId != element.id);
 }
 
 void onCompleteButtonPress(BuildContext context) {
   if (_formKey.currentState!.validate()) {
-    if(isTitleExisting() || _titleController.text.isEmpty) return;
+    if (isTitleExisting() || _titleController.text.isEmpty) return;
     String title = _titleController.text;
     String description = _descriptionController.text;
     String frequency = _selectedFrequency;
     int iconPoint = _selectedIcon;
     int colorValue = _selectedColor;
 
-    if(!_isEdit) {
+    if (!_isEdit) {
       // Create new Habit
-      var newHabit = Habit(title: title, description: description, frequency: frequency, color: colorValue, iconCodePoint: iconPoint, creationDate: _selectedCreationDate);
+      var newHabit = Habit(
+          title: title,
+          description: description,
+          frequency: frequency,
+          color: colorValue,
+          iconCodePoint: iconPoint,
+          creationDate: _selectedCreationDate);
       // Add habit to SharedPreferences using HabitManager
       HabitManager.addHabit(newHabit);
     } else {
-      HabitManager.editHabit(_oldHabitId, title, description, frequency, colorValue, iconPoint);
+      HabitManager.editHabit(_oldHabitId, title, description, frequency,
+          colorValue, iconPoint, _selectedCreationDate);
     }
     Navigator.pop(context);
   }
@@ -43,28 +50,29 @@ void onCompleteButtonPress(BuildContext context) {
 
 void onDeleteButtonPress(BuildContext context) {
   showDialog(
-    context: context,
-    builder: (context) {
-      return BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
-        child: AlertDialog(
-          backgroundColor: Colors.black,
-          title: const Text("Delete Habit", style: TextStyle(color: Colors.white)),
-          content: const Text("Are you sure you want to delete this habit?", style: TextStyle(color: Colors.white)),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text("Cancel"),
-            ),
-            TextButton(
-              onPressed: () => onDeleteConfirmButtonPress(context),
-              child: const Text("Delete", style: TextStyle(color: Colors.red)),
-            ),
-          ],
-        )
-      );
-    }
-  );
+      context: context,
+      builder: (context) {
+        return BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+            child: AlertDialog(
+              backgroundColor: Colors.black,
+              title: const Text("Delete Habit",
+                  style: TextStyle(color: Colors.white)),
+              content: const Text("Are you sure you want to delete this habit?",
+                  style: TextStyle(color: Colors.white)),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text("Cancel"),
+                ),
+                TextButton(
+                  onPressed: () => onDeleteConfirmButtonPress(context),
+                  child:
+                      const Text("Delete", style: TextStyle(color: Colors.red)),
+                ),
+              ],
+            ));
+      });
 }
 
 void onDeleteConfirmButtonPress(BuildContext context) {
@@ -90,44 +98,43 @@ class NewHabitScreen extends StatelessWidget {
             child: Column(
               children: <Widget>[
                 InputWidget(
-                  controller: _titleController,
-                  name: 'Title',
-                  isTitle: true
-                ),
+                    controller: _titleController, name: 'Title', isTitle: true),
                 InputWidget(
-                  controller: _descriptionController,
-                  name: 'Description',
-                    isTitle: false
-                ),
+                    controller: _descriptionController,
+                    name: 'Description',
+                    isTitle: false),
                 const Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children:[
-                      DropDownButton(),
-                      DatePickerWidget()
-                    ]
-                  ),
+                    children: [DropDownButton(), DatePickerWidget()]),
                 const Align(
                   alignment: Alignment.centerLeft,
-                  child: Padding(padding: EdgeInsets.all(5),
-                    child:Text("Icon", style: TextStyle(color: Colors.white))),
+                  child: Padding(
+                      padding: EdgeInsets.all(5),
+                      child:
+                          Text("Icon", style: TextStyle(color: Colors.white))),
                 ),
-                const Expanded(child:IconGrid()),
+                const Expanded(child: IconGrid()),
                 const Align(
                   alignment: Alignment.centerLeft,
-                  child: Padding(padding: EdgeInsets.all(5),
-                      child:Text("Color", style: TextStyle(color: Colors.white))),
+                  child: Padding(
+                      padding: EdgeInsets.all(5),
+                      child:
+                          Text("Color", style: TextStyle(color: Colors.white))),
                 ),
                 const Expanded(child: ColorGrid()),
-                if(_isEdit) 
+                if (_isEdit)
                   IconButton(
-                    onPressed: (){ onDeleteButtonPress(context); },
-                    icon: const Icon(Icons.delete, color: Colors.red, size: 30)
-                  )
+                      onPressed: () {
+                        onDeleteButtonPress(context);
+                      },
+                      icon:
+                          const Icon(Icons.delete, color: Colors.red, size: 30))
               ],
             )),
       ),
     );
   }
+
   NewHabitScreen({super.key}) {
     _isEdit = false;
     _oldHabitId = "";
@@ -136,6 +143,7 @@ class NewHabitScreen extends StatelessWidget {
     _selectedFrequency = 'Daily';
     _selectedIcon = Icons.bed_rounded.codePoint;
     _selectedColor = app_colors.HexColor.fromHex("#D3D5AE").value;
+    _selectedCreationDate = DateTime.now();
   }
 
   NewHabitScreen.edit(Habit habit, {super.key}) {
@@ -146,9 +154,9 @@ class NewHabitScreen extends StatelessWidget {
     _selectedFrequency = habit.frequency;
     _selectedIcon = habit.iconCodePoint;
     _selectedColor = habit.color;
+    _selectedCreationDate = habit.creationDate;
   }
 }
-
 
 class Header extends StatelessWidget {
   @override
@@ -197,6 +205,7 @@ class Header extends StatelessWidget {
               ),
             ]));
   }
+
   const Header({super.key});
   final double iconSize = 30.0;
 }
@@ -206,10 +215,15 @@ class InputWidget extends StatefulWidget {
   TextEditingController controller;
   String name;
   bool isTitle;
-  InputWidget({super.key, required this.controller, required this.name, required this.isTitle});
+  InputWidget(
+      {super.key,
+      required this.controller,
+      required this.name,
+      required this.isTitle});
   @override
   State<StatefulWidget> createState() => _InputWidgetState();
 }
+
 class _InputWidgetState extends State<InputWidget> {
   @override
   Widget build(BuildContext context) {
@@ -218,24 +232,20 @@ class _InputWidgetState extends State<InputWidget> {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 4),
           child: TextFormField(
-            onChanged: (newValue){
-              setState(() {
-              });
+            onChanged: (newValue) {
+              setState(() {});
             },
             controller: widget.controller,
             focusNode: widget.focusNode,
             cursorColor: Colors.white,
             style: TextStyle(color: Colors.white, fontSize: inputLabelSize),
             decoration: InputDecoration(
-              errorText: (widget.isTitle && isTitleExisting() ? "This habit already exists" : null),
-              errorStyle: (widget.isTitle && isTitleExisting() ? TextStyle(
-                color: Colors.red,
-                fontSize: inputLabelSize)
-              :
-              TextStyle(
-                  color: Colors.white,
-                  fontSize: inputLabelSize)
-              ),
+              errorText: (widget.isTitle && isTitleExisting()
+                  ? "This habit already exists"
+                  : null),
+              errorStyle: (widget.isTitle && isTitleExisting()
+                  ? TextStyle(color: Colors.red, fontSize: inputLabelSize)
+                  : TextStyle(color: Colors.white, fontSize: inputLabelSize)),
               labelText: widget.name,
               labelStyle: TextStyle(
                 color: Colors.white,
@@ -261,37 +271,35 @@ class _InputWidgetState extends State<InputWidget> {
   final double inputTextSize = 16;
 }
 
-
-class DatePickerWidget extends StatefulWidget{
+class DatePickerWidget extends StatefulWidget {
   const DatePickerWidget({super.key});
   @override
   State<StatefulWidget> createState() => _DatePickerWidgetState();
 }
-class _DatePickerWidgetState extends State<DatePickerWidget>{
 
-  DateTime selectedDate = DateTime.now();
-
+class _DatePickerWidgetState extends State<DatePickerWidget> {
   Future<void> _selectDate(BuildContext context) async {
     DateTime? pickedDate = await showDatePicker(
       context: context,
-      initialDate: selectedDate,
+      initialDate: _selectedCreationDate,
       firstDate: DateTime.now(),
       lastDate: DateTime(2100),
     );
-    if (pickedDate != null && pickedDate != selectedDate) {
+    if (pickedDate != null && pickedDate != _selectedCreationDate) {
       setState(() {
-        selectedDate = pickedDate;
         _selectedCreationDate = pickedDate;
       });
     }
   }
+
   String _addLeadingZero(int number) {
     if (number < 10) {
       return '0$number';
     }
     return number.toString();
   }
-  String dateTimeToDateString(DateTime day){
+
+  String dateTimeToDateString(DateTime day) {
     return "${day.year}-${_addLeadingZero(day.month)}-${_addLeadingZero(day.day)}";
   }
 
@@ -307,15 +315,14 @@ class _DatePickerWidgetState extends State<DatePickerWidget>{
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          const Icon(Icons.calendar_month_rounded,
-              color: Colors.white),
+          const Icon(Icons.calendar_month_rounded, color: Colors.white),
           ElevatedButton(
             style: ButtonStyle(
               backgroundColor: MaterialStateProperty.all<Color>(Colors.black),
             ),
             onPressed: () => _selectDate(context),
             child: Text(
-              dateTimeToDateString(selectedDate) ?? "",
+              dateTimeToDateString(_selectedCreationDate) ?? "",
               style: const TextStyle(fontSize: 16),
             ),
           ),
@@ -325,20 +332,15 @@ class _DatePickerWidgetState extends State<DatePickerWidget>{
   }
 }
 
-
 class DropDownButton extends StatefulWidget {
   const DropDownButton({super.key});
   @override
   State<StatefulWidget> createState() => DropDownButtonState();
 }
+
 class DropDownButtonState extends State<DropDownButton> {
   var dropdownValue = _selectedFrequency;
-  List<String> frequencyList = <String>[
-    'Daily',
-    'Weekly',
-    'Monthly',
-    'Yearly'
-  ];
+  List<String> frequencyList = <String>['Daily', 'Weekly', 'Monthly', 'Yearly'];
 
   void onChanged(String? value) {
     setState(() {
@@ -391,7 +393,6 @@ class _IconGridState extends State<IconGrid> {
     Icons.wallet_rounded,
     Icons.directions_run_rounded,
     Icons.weekend_rounded,
-
     Icons.access_alarm_rounded,
     Icons.menu_book,
     Icons.add_a_photo_rounded,
@@ -399,7 +400,6 @@ class _IconGridState extends State<IconGrid> {
     Icons.calendar_month_rounded,
     Icons.work,
     Icons.house_rounded,
-
     Icons.draw_rounded,
     Icons.code_rounded,
     Icons.coffee_outlined,
@@ -409,30 +409,33 @@ class _IconGridState extends State<IconGrid> {
     Icons.music_note_rounded,
   ];
 
-
   @override
   Widget build(BuildContext context) {
-    int selectedIndex = icons.indexWhere((element) => element.codePoint == _selectedIcon);
+    int selectedIndex =
+        icons.indexWhere((element) => element.codePoint == _selectedIcon);
 
     return GridView.builder(
         itemCount: icons.length,
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 7),
+        gridDelegate:
+            const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 7),
         itemBuilder: (context, index) {
           return Container(
-            decoration: BoxDecoration(
-                border: Border.all(width:2,color:  (selectedIndex == index ? app_colors.appPink : Colors.black)),
-                borderRadius: BorderRadius.circular(25)),
+              decoration: BoxDecoration(
+                  border: Border.all(
+                      width: 2,
+                      color: (selectedIndex == index
+                          ? app_colors.appPink
+                          : Colors.black)),
+                  borderRadius: BorderRadius.circular(25)),
               child: GestureDetector(
-                onTap: () {
-                  setState(() {
-                    selectedIndex = index;
-                  });
-                  _selectedIcon = icons[index].codePoint;
-                },
-                  child: Icon(icons[index], color: Colors.white,size: 30))
-              );
-        }
-    );
+                  onTap: () {
+                    setState(() {
+                      selectedIndex = index;
+                    });
+                    _selectedIcon = icons[index].codePoint;
+                  },
+                  child: Icon(icons[index], color: Colors.white, size: 30)));
+        });
   }
 }
 
@@ -450,14 +453,12 @@ class _ColorGridState extends State<ColorGrid> {
     "#76A07B",
     "#43866A",
     "#006C5E",
-
     "#9AC0B7",
     "#79A1A0",
     "#5D8289",
     "#446571",
     "#2F4858",
     "#B9BDDF",
-
     "#ABA1C6",
     "#9E84AA",
     "#92688C",
@@ -468,27 +469,33 @@ class _ColorGridState extends State<ColorGrid> {
 
   @override
   Widget build(BuildContext context) {
-    int selectedIndex = colorsHexs.indexWhere((element) => app_colors.HexColor.fromHex(element).value == _selectedColor);
+    int selectedIndex = colorsHexs.indexWhere((element) =>
+        app_colors.HexColor.fromHex(element).value == _selectedColor);
     return GridView.builder(
         itemCount: colorsHexs.length,
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 7),
+        gridDelegate:
+            const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 7),
         itemBuilder: (context, index) {
           return Container(
-            width: 20,
-            height: 20,
+              width: 20,
+              height: 20,
               decoration: BoxDecoration(
                   color: app_colors.HexColor.fromHex(colorsHexs[index]),
-                  border: Border.all(width:2, color:  (selectedIndex == index ? app_colors.appPink : Colors.black)),
+                  border: Border.all(
+                      width: 2,
+                      color: (selectedIndex == index
+                          ? app_colors.appPink
+                          : Colors.black)),
                   borderRadius: BorderRadius.circular(25)),
               child: GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      selectedIndex = index;
-                    });
-                    _selectedColor = app_colors.HexColor.fromHex(colorsHexs[index]).value;
-                  },
-          ));
-        }
-    );
+                onTap: () {
+                  setState(() {
+                    selectedIndex = index;
+                  });
+                  _selectedColor =
+                      app_colors.HexColor.fromHex(colorsHexs[index]).value;
+                },
+              ));
+        });
   }
 }
