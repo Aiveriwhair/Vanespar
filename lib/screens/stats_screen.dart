@@ -4,10 +4,10 @@ import 'package:vanespar/logic/TimeUtils.dart';
 import 'package:vanespar/logic/habit_manager.dart';
 
 import '../logic/habit.dart';
-import '../main.dart';
+import 'package:vanespar/assets/colors.dart' as app_colors;
 
 //////////////////////////////////////////////////////////////////////// CONSTANTS
-final Color uncompleteColor = HexColor.fromHex("#353535");
+final Color uncompleteColor = app_colors.HexColor.fromHex("#353535");
 const Color completeColor = Colors.yellow;
 const double labelSize = 16.0;
 
@@ -33,7 +33,8 @@ class _StatsScreenState extends State<StatsScreen> {
     "Day",
   ];
   List<Widget Function(List<Habit>, Function(DateTime))> calendarWidgets = [
-    (List<Habit> habits, Function(DateTime) updateSelectedDay) => DayCalendarWidget(habits: habits, updateSelectedDay: updateSelectedDay),
+    (List<Habit> habits, Function(DateTime) updateSelectedDay) =>
+        DayCalendarWidget(habits: habits, updateSelectedDay: updateSelectedDay),
   ];
   ////////////////// CALENDAR STATES
   List<Habit> calendarHabits = HabitManager.getHabits();
@@ -45,14 +46,13 @@ class _StatsScreenState extends State<StatsScreen> {
         appBar:
             AppBar(title: const HeaderWidget(), backgroundColor: Colors.black),
         body: Container(
-            width: MediaQuery.of(context).size.width,
-            padding: const EdgeInsets.all(0.0),
-            color: Colors.black,
-            child: Column(
+          width: MediaQuery.of(context).size.width,
+          padding: const EdgeInsets.all(0.0),
+          color: Colors.black,
+          child: Column(children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
                 Padding(
                     padding:
                         const EdgeInsets.symmetric(horizontal: 0, vertical: 8),
@@ -85,61 +85,64 @@ class _StatsScreenState extends State<StatsScreen> {
                         return DropdownMenuItem<String>(
                           value: value,
                           child: Text(
-                            value.length >= 10 ? "${value.substring(0, 9)}..." : value,
+                            value.length >= 10
+                                ? "${value.substring(0, 9)}..."
+                                : value,
                             style: const TextStyle(color: Colors.white),
                             overflow: TextOverflow.ellipsis,
                           ),
                         );
                       }).toList(),
                     )),
-                  Container(
-                    height: 50,
-                    width: 80 * calendarView.length.toDouble(),
-                    padding: const EdgeInsets.all(5),
-                    alignment: Alignment.center,
-                    child: ListView.builder(
-                        itemCount: calendarView.length,
-                        scrollDirection: Axis.horizontal,
-                        itemExtent: 70,
-                        itemBuilder: (context, index) {
-                          return GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  modeSelectedIndex = index;
-                                });
-                              },
-                              child: Container(
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(30),
-                                    border: Border.all(
-                                        width: 2,
-                                        color: (modeSelectedIndex == index
-                                            ? Colors.white
-                                            : Colors.grey))),
-                                child: Center(
-                                    child: Text(
-                                  calendarView[index],
-                                  style: TextStyle(
+                Container(
+                  height: 50,
+                  width: 80 * calendarView.length.toDouble(),
+                  padding: const EdgeInsets.all(5),
+                  alignment: Alignment.center,
+                  child: ListView.builder(
+                      itemCount: calendarView.length,
+                      scrollDirection: Axis.horizontal,
+                      itemExtent: 70,
+                      itemBuilder: (context, index) {
+                        return GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                modeSelectedIndex = index;
+                              });
+                            },
+                            child: Container(
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(30),
+                                  border: Border.all(
+                                      width: 2,
                                       color: (modeSelectedIndex == index
                                           ? Colors.white
-                                          : Colors.grey)),
-                                )),
-                              ));
-                        }),
-                  ),
-                  ],
+                                          : Colors.grey))),
+                              child: Center(
+                                  child: Text(
+                                calendarView[index],
+                                style: TextStyle(
+                                    color: (modeSelectedIndex == index
+                                        ? Colors.white
+                                        : Colors.grey)),
+                              )),
+                            ));
+                      }),
                 ),
-                  Container(
-                    child: calendarWidgets[modeSelectedIndex](calendarHabits, (DateTime newSelectedDay){
-                      setState(() {
-                        selectedDay = newSelectedDay;
-                      });
-                    }),
-                  ),
-                  Expanded(child: HabitListWidget(selectedDay: selectedDay))
-                  //HabitListWidget(habits: calendarHabits)
-                ]),
-            ));
+              ],
+            ),
+            Container(
+              child: calendarWidgets[modeSelectedIndex](calendarHabits,
+                  (DateTime newSelectedDay) {
+                setState(() {
+                  selectedDay = newSelectedDay;
+                });
+              }),
+            ),
+            Expanded(child: HabitListWidget(selectedDay: selectedDay))
+            //HabitListWidget(habits: calendarHabits)
+          ]),
+        ));
   }
 }
 
@@ -160,7 +163,8 @@ class HeaderWidget extends StatelessWidget {
 class DayCalendarWidget extends StatefulWidget {
   final List<Habit> habits;
   final Function(DateTime) updateSelectedDay;
-  const DayCalendarWidget({super.key, required this.habits, required this.updateSelectedDay});
+  const DayCalendarWidget(
+      {super.key, required this.habits, required this.updateSelectedDay});
   @override
   State<StatefulWidget> createState() => _DayCalendarWidgetState();
 }
@@ -168,15 +172,19 @@ class DayCalendarWidget extends StatefulWidget {
 class _DayCalendarWidgetState extends State<DayCalendarWidget> {
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
-  DateTime firstDay = getFirstDayOfMonth(HabitManager.getFirstCreatedHabitDay() ?? DateTime.now());
+  DateTime firstDay = getFirstDayOfMonth(
+      HabitManager.getFirstCreatedHabitDay() ?? DateTime.now());
   DateTime lastDay = getLastDayOfMonth(DateTime.now());
 
   @override
   Widget build(BuildContext context) {
     bool isLeftChevronVisible() {
-      DateTime firstDayOfNextMonth = DateTime(firstDay.year, firstDay.month + 1, 1);
-      return _focusedDay.isAfter(firstDayOfNextMonth) || _focusedDay.isAtSameMomentAs(firstDayOfNextMonth);
+      DateTime firstDayOfNextMonth =
+          DateTime(firstDay.year, firstDay.month + 1, 1);
+      return _focusedDay.isAfter(firstDayOfNextMonth) ||
+          _focusedDay.isAtSameMomentAs(firstDayOfNextMonth);
     }
+
     return SingleChildScrollView(
         child: TableCalendar(
             focusedDay: _focusedDay,
@@ -207,7 +215,7 @@ class _DayCalendarWidgetState extends State<DayCalendarWidget> {
             ),
             rowHeight: 60,
             headerStyle: HeaderStyle(
-              leftChevronVisible:isLeftChevronVisible(),
+                leftChevronVisible: isLeftChevronVisible(),
                 rightChevronVisible:
                     ((DateTime.now().month == _focusedDay.month &&
                             DateTime.now().year == _focusedDay.year)
@@ -261,28 +269,32 @@ class _DayCalendarWidgetState extends State<DayCalendarWidget> {
   }
 }
 
-
-class HabitListWidget extends StatefulWidget{
+class HabitListWidget extends StatefulWidget {
   DateTime selectedDay;
   HabitListWidget({super.key, required this.selectedDay});
   @override
   State<StatefulWidget> createState() => _HabitListWidgetState();
-
 }
+
 class _HabitListWidgetState extends State<HabitListWidget> {
   @override
   Widget build(BuildContext context) {
-    var notCompletedHabits = HabitManager.getNotCompletedHabitsOnDay(widget.selectedDay);
-    var completedHabits = HabitManager.getCompletedHabitsOnDay(widget.selectedDay);
-    return Row(children:[
-      Expanded(child:
-      ListView.builder(
+    var notCompletedHabits =
+        HabitManager.getNotCompletedHabitsOnDay(widget.selectedDay);
+    var completedHabits =
+        HabitManager.getCompletedHabitsOnDay(widget.selectedDay);
+    return Row(children: [
+      Expanded(
+          child: ListView.builder(
         itemCount: completedHabits.length,
         itemBuilder: (BuildContext context, int index) {
           Habit habit = completedHabits[index];
           return ListTile(
-            onTap: (){
-              HabitManager.setHabitCompletion(habit.id, !habit.isCompletedOnDay(widget.selectedDay), widget.selectedDay);
+            onTap: () {
+              HabitManager.setHabitCompletion(
+                  habit.id,
+                  !habit.isCompletedOnDay(widget.selectedDay),
+                  widget.selectedDay);
               setState(() {});
             },
             title: Padding(
@@ -295,33 +307,32 @@ class _HabitListWidgetState extends State<HabitListWidget> {
           );
         },
       )),
-      Expanded(child:
-      ListView.builder(
+      Expanded(
+          child: ListView.builder(
         itemCount: notCompletedHabits.length,
         itemBuilder: (BuildContext context, int index) {
           Habit habit = notCompletedHabits[index];
           return ListTile(
-            onTap: (){
-              HabitManager.setHabitCompletion(habit.id, !habit.isCompletedOnDay(widget.selectedDay), widget.selectedDay);
+            onTap: () {
+              HabitManager.setHabitCompletion(
+                  habit.id,
+                  !habit.isCompletedOnDay(widget.selectedDay),
+                  widget.selectedDay);
               setState(() {});
             },
-            title:
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 5),
-                    child: Text(
-                    habit.title,
-                    style: const TextStyle(color: Colors.red),
-                    overflow: TextOverflow.ellipsis,
+            title: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 5),
+                child: Text(
+                  habit.title,
+                  style: const TextStyle(color: Colors.red),
+                  overflow: TextOverflow.ellipsis,
                 )),
           );
         },
       )),
-    ]
-    );
+    ]);
   }
 }
-
-
 
 class TestWidget extends StatefulWidget {
   final String string;
@@ -329,6 +340,7 @@ class TestWidget extends StatefulWidget {
   @override
   State<StatefulWidget> createState() => _TestWidgetState();
 }
+
 class _TestWidgetState extends State<TestWidget> {
   @override
   Widget build(BuildContext context) {
