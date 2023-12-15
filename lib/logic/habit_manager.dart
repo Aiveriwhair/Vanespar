@@ -2,8 +2,10 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'habit.dart';
+import 'package:logger/logger.dart';
 
 class HabitManager {
+  static final Logger _logger = Logger();
   static List<Habit> habits = [];
   static late SharedPreferences _prefs;
   static final _habitsStreamController =
@@ -17,6 +19,8 @@ class HabitManager {
   static Future<void> _initSharedPreferences() async {
     _prefs = await SharedPreferences.getInstance();
     _loadHabitsFromPrefs();
+
+    _logger.i('Shared Preferences initialized');
   }
 
   static void _loadHabitsFromPrefs() {
@@ -25,6 +29,8 @@ class HabitManager {
         habitsJson.map((habit) => json.decode(habit)).toList());
     habits = habitsData.map((habitData) => Habit.fromJson(habitData)).toList();
     _habitsStreamController.add(habits);
+
+    _logger.i('Habits loaded from prefs: $habits');
   }
 
   static Future<void> _saveHabitsToPrefs() async {
@@ -32,30 +38,35 @@ class HabitManager {
         habits.map((habit) => json.encode(habit.toJson())).toList();
     await _prefs.setStringList('habits', habitsJsonList);
     _habitsStreamController.add(habits);
+
+    _logger.i('Habits saved to prefs: $habits');
   }
 
   static void addHabit(Habit habit) {
     habits.add(habit);
     _saveHabitsToPrefs();
+
+    _logger.i('Habit added: $habit');
   }
 
   static List<Habit> getHabits() {
     return habits;
   }
-  static (List<Habit>,List<Habit>) getHabitsOnDay(DateTime day) {
+
+  static (List<Habit>, List<Habit>) getHabitsOnDay(DateTime day) {
     return (getCompletableHabitsOnDay(day), getNotCompletableHabitsOnDay(day));
   }
 
   static DateTime? getFirstCreatedHabitDay() {
     if (habits.isNotEmpty) {
       Habit? firstHabit = habits.reduce((current, next) {
-        return current.creationDate.isBefore(next.creationDate) ? current : next;
+        return current.creationDate.isBefore(next.creationDate)
+            ? current
+            : next;
       });
 
-      return DateTime(
-          firstHabit.creationDate.year,
-          firstHabit.creationDate.month,
-          firstHabit.creationDate.day);
+      return DateTime(firstHabit.creationDate.year,
+          firstHabit.creationDate.month, firstHabit.creationDate.day);
     } else {
       return null;
     }
@@ -72,8 +83,12 @@ class HabitManager {
   static List<Habit> getCompletedHabitsOnDay(DateTime day) {
     return habits.where((element) => element.completedOnDay(day)).toList();
   }
+
   static List<Habit> getNotCompletedHabitsOnDay(DateTime day) {
-    return habits.where((element) => (!element.completedOnDay(day) && element.isCompletableOnDay(day))).toList();
+    return habits
+        .where((element) =>
+            (!element.completedOnDay(day) && element.isCompletableOnDay(day)))
+        .toList();
   }
 
   static Habit getHabitById(String id) {
@@ -88,6 +103,8 @@ class HabitManager {
     habits.insert(newIndex, habit);
     _habitsStreamController.add(habits);
     _saveHabitsToPrefs();
+
+    _logger.i('Habit reordered: ${habits[newIndex]}');
   }
 
   static void setHabitLastDayCompletion(String habitId, bool completed) {
@@ -98,16 +115,23 @@ class HabitManager {
       habits[index].completionDates.add(DateTime.now());
     }
     _saveHabitsToPrefs();
+
+    _logger.i('Habit last day completion set: ${habits[index]}');
   }
 
-  static void setHabitCompletion(String habitId, bool completed, DateTime day){
+  static void setHabitCompletion(String habitId, bool completed, DateTime day) {
     int index = habits.indexWhere((element) => element.id == habitId);
     if (habits[index].isCompletedOnDay(day) && !completed) {
-      habits[index].completionDates.removeWhere((element) => element.year == day.year && element.month == day.month && element.day == day.day);
+      habits[index].completionDates.removeWhere((element) =>
+          element.year == day.year &&
+          element.month == day.month &&
+          element.day == day.day);
     } else if (!habits[index].isCompletedToday() && completed) {
       habits[index].completionDates.add(day);
     }
     _saveHabitsToPrefs();
+
+    _logger.i('Habit completion set: ${habits[index]}');
   }
 
   // Edit habit based on id
@@ -121,10 +145,15 @@ class HabitManager {
     habits[index].iconCodePoint = iconPoint;
     habits[index].creationDate = creationDate;
     _saveHabitsToPrefs();
+    _logger.i('Habit edited: ${habits[index]}');
   }
 
   static void deleteHabit(String id) {
     habits.removeWhere((habit) => habit.id == id);
     _saveHabitsToPrefs();
+  }
+
+  void logHabitManagerState() {
+    _logger.i('HabitManager State: $habits');
   }
 }
