@@ -92,27 +92,18 @@ class NewHabitScreen extends StatelessWidget {
       body: Form(
         key: _formKey,
         child: Container(
-            width: MediaQuery.of(context).size.width,
             padding: const EdgeInsets.all(30.0),
             color: Colors.black,
             child: Column(
-              children: <Widget>[
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
                 InputWidget(
                     controller: _titleController, name: 'Title', isTitle: true),
                 InputWidget(
                     controller: _descriptionController,
                     name: 'Description',
                     isTitle: false),
-                const Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [DropDownButton(), DatePickerWidget()]),
-                const Align(
-                  alignment: Alignment.centerLeft,
-                  child: Padding(
-                      padding: EdgeInsets.all(5),
-                      child:
-                          Text("Icon", style: TextStyle(color: Colors.white))),
-                ),
+                Container(height: 30),
                 const Expanded(child: IconGrid()),
                 const Align(
                   alignment: Alignment.centerLeft,
@@ -340,7 +331,7 @@ class DropDownButton extends StatefulWidget {
 
 class DropDownButtonState extends State<DropDownButton> {
   var dropdownValue = _selectedFrequency;
-  List<String> frequencyList = <String>['Daily', 'Weekly', 'Monthly', 'Yearly'];
+  List<String> frequencyList = <String>['Daily'];
 
   void onChanged(String? value) {
     setState(() {
