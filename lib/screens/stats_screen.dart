@@ -27,15 +27,6 @@ class _StatsScreenState extends State<StatsScreen> {
     ...HabitManager.getHabits().map((e) => e.title)
   ];
 
-  ////////////////// MODE SELECTION STATES
-  int modeSelectedIndex = 0;
-  List<String> calendarView = [
-    "Day",
-  ];
-  List<Widget Function(List<Habit>, Function(DateTime))> calendarWidgets = [
-    (List<Habit> habits, Function(DateTime) updateSelectedDay) =>
-        DayCalendarWidget(habits: habits, updateSelectedDay: updateSelectedDay),
-  ];
   ////////////////// CALENDAR STATES
   List<Habit> calendarHabits = HabitManager.getHabits();
   DateTime selectedDay = DateTime.now();
@@ -94,53 +85,17 @@ class _StatsScreenState extends State<StatsScreen> {
                         );
                       }).toList(),
                     )),
-                Container(
-                  height: 50,
-                  width: 80 * calendarView.length.toDouble(),
-                  padding: const EdgeInsets.all(5),
-                  alignment: Alignment.center,
-                  child: ListView.builder(
-                      itemCount: calendarView.length,
-                      scrollDirection: Axis.horizontal,
-                      itemExtent: 70,
-                      itemBuilder: (context, index) {
-                        return GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                modeSelectedIndex = index;
-                              });
-                            },
-                            child: Container(
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(30),
-                                  border: Border.all(
-                                      width: 2,
-                                      color: (modeSelectedIndex == index
-                                          ? Colors.white
-                                          : Colors.grey))),
-                              child: Center(
-                                  child: Text(
-                                calendarView[index],
-                                style: TextStyle(
-                                    color: (modeSelectedIndex == index
-                                        ? Colors.white
-                                        : Colors.grey)),
-                              )),
-                            ));
-                      }),
-                ),
               ],
             ),
             Container(
-              child: calendarWidgets[modeSelectedIndex](calendarHabits,
-                  (DateTime newSelectedDay) {
-                setState(() {
-                  selectedDay = newSelectedDay;
-                });
-              }),
-            ),
+                child: DayCalendarWidget(
+                    habits: calendarHabits,
+                    updateSelectedDay: (DateTime newSelectedDay) {
+                      setState(() {
+                        selectedDay = newSelectedDay;
+                      });
+                    })),
             Expanded(child: HabitListWidget(selectedDay: selectedDay))
-            //HabitListWidget(habits: calendarHabits)
           ]),
         ));
   }
@@ -185,6 +140,11 @@ class _DayCalendarWidgetState extends State<DayCalendarWidget> {
           _focusedDay.isAtSameMomentAs(firstDayOfNextMonth);
     }
 
+    bool isRightChevronVisible() {
+      return _focusedDay.month < DateTime.now().month ||
+          _focusedDay.year < DateTime.now().year;
+    }
+
     return SingleChildScrollView(
         child: TableCalendar(
             focusedDay: _focusedDay,
@@ -215,15 +175,17 @@ class _DayCalendarWidgetState extends State<DayCalendarWidget> {
             ),
             rowHeight: 60,
             headerStyle: HeaderStyle(
-                leftChevronVisible: isLeftChevronVisible(),
-                rightChevronVisible:
-                    ((DateTime.now().month == _focusedDay.month &&
-                            DateTime.now().year == _focusedDay.year)
-                        ? false
-                        : true),
+                leftChevronVisible: true,
+                rightChevronVisible: true,
+                leftChevronIcon: Icon(Icons.chevron_left,
+                    color: isLeftChevronVisible() ? Colors.white : Colors.grey,
+                    size: 30),
+                rightChevronIcon: Icon(Icons.chevron_right,
+                    color: isRightChevronVisible() ? Colors.white : Colors.grey,
+                    size: 30),
                 formatButtonVisible: false,
                 formatButtonShowsNext: false,
-                titleCentered: true,
+                titleCentered: false,
                 titleTextStyle: const TextStyle(color: Colors.white)),
             calendarBuilders:
                 CalendarBuilders(todayBuilder: (context, day, day2) {
