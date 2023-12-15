@@ -1,7 +1,6 @@
 import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class Habit {
@@ -34,8 +33,10 @@ class Habit {
         date.month == today.month &&
         date.day == today.day);
   }
-  bool isCompletedOnDay(DateTime day){
-    return completionDates.any((element) => element.year == day.year &&
+
+  bool isCompletedOnDay(DateTime day) {
+    return completionDates.any((element) =>
+        element.year == day.year &&
         element.month == day.month &&
         element.day == day.day);
   }
@@ -74,7 +75,8 @@ class Habit {
         throw Exception("Invalid frequency");
     }
 
-    List<bool> completions = completableDates.map((date) => isCompletedOnDay(date)).toList();
+    List<bool> completions =
+        completableDates.map((date) => isCompletedOnDay(date)).toList();
     return completions.reversed.toList();
   }
 
@@ -84,8 +86,10 @@ class Habit {
         element.month == day.month &&
         element.day == day.day);
   }
+
   bool isCompletableOnDay(DateTime day) {
-    if (day.isBefore(DateTime(creationDate.year, creationDate.month, creationDate.day))) {
+    if (day.isBefore(
+        DateTime(creationDate.year, creationDate.month, creationDate.day))) {
       return false;
     }
     switch (frequency) {
@@ -99,7 +103,6 @@ class Habit {
         return false;
     }
   }
-
 
   static String generateUniqueId() {
     Random random = Random();
@@ -115,7 +118,7 @@ class Habit {
       'description': description,
       'color': color,
       'iconCodePoint': iconCodePoint,
-      'creationDate' : creationDate.toIso8601String(),
+      'creationDate': creationDate.toIso8601String(),
       'completionDates':
           completionDates.map((date) => date.toIso8601String()).toList(),
     };
