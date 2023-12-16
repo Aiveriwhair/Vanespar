@@ -121,17 +121,23 @@ class HabitManager {
 
   static void setHabitCompletion(String habitId, bool completed, DateTime day) {
     int index = habits.indexWhere((element) => element.id == habitId);
+
+    if (index == -1) {
+      _logger.e('Couldn\'t set habit completion ($habitId not found)');
+      return;
+    }
+
     if (habits[index].isCompletedOnDay(day) && !completed) {
       habits[index].completionDates.removeWhere((element) =>
           element.year == day.year &&
           element.month == day.month &&
           element.day == day.day);
-    } else if (!habits[index].isCompletedToday() && completed) {
+    } else if (!habits[index].isCompletedOnDay(day) && completed) {
       habits[index].completionDates.add(day);
     }
     _saveHabitsToPrefs();
 
-    _logger.i('Habit completion set: ${habits[index]}');
+    _logger.i('Habit completion set: ${habits[index].id} : $completed : $day');
   }
 
   // Edit habit based on id
@@ -153,7 +159,8 @@ class HabitManager {
     _saveHabitsToPrefs();
   }
 
-  void logHabitManagerState() {
-    _logger.i('HabitManager State: $habits');
+// Log habits using json format
+  static void logHabitManagerState() {
+    _logger.i('Habit Manager State: ${json.encode(habits)}');
   }
 }
