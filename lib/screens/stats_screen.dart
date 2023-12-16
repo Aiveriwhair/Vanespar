@@ -20,6 +20,10 @@ class StatsScreen extends StatefulWidget {
 }
 
 class _StatsScreenState extends State<StatsScreen> {
+  void refresh() {
+    setState(() {});
+  }
+
   ////////////////// HABIT SELECTION STATES
   int habitSelectedIndex = 0;
   List<String> habitTitles = [
@@ -87,15 +91,18 @@ class _StatsScreenState extends State<StatsScreen> {
                     )),
               ],
             ),
-            Container(
-                child: DayCalendarWidget(
-                    habits: calendarHabits,
-                    updateSelectedDay: (DateTime newSelectedDay) {
-                      setState(() {
-                        selectedDay = newSelectedDay;
-                      });
-                    })),
-            Expanded(child: HabitListWidget(selectedDay: selectedDay))
+            DayCalendarWidget(
+                habits: calendarHabits,
+                updateSelectedDay: (DateTime newSelectedDay) {
+                  setState(() {
+                    selectedDay = newSelectedDay;
+                  });
+                }),
+            Expanded(
+                child: HabitListWidget(
+              selectedDay: selectedDay,
+              refresh: refresh,
+            ))
           ]),
         ));
   }
@@ -233,7 +240,9 @@ class _DayCalendarWidgetState extends State<DayCalendarWidget> {
 
 class HabitListWidget extends StatefulWidget {
   DateTime selectedDay;
-  HabitListWidget({super.key, required this.selectedDay});
+  final Function refresh;
+  HabitListWidget(
+      {super.key, required this.selectedDay, required this.refresh});
   @override
   State<StatefulWidget> createState() => _HabitListWidgetState();
 }
@@ -257,10 +266,16 @@ class _HabitListWidgetState extends State<HabitListWidget> {
                   habit.id,
                   !habit.isCompletedOnDay(widget.selectedDay),
                   widget.selectedDay);
-              setState(() {});
+              widget.refresh();
             },
-            title: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 5),
+            leading: Icon(
+              IconData(habit.iconCodePoint, fontFamily: 'MaterialIcons'),
+              color: Colors.white,
+            ),
+            title: Container(
+                alignment: Alignment.centerLeft,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
                 child: Text(
                   habit.title,
                   style: const TextStyle(color: Colors.white),
@@ -269,6 +284,10 @@ class _HabitListWidgetState extends State<HabitListWidget> {
           );
         },
       )),
+      Container(
+        width: 1,
+        color: Colors.grey,
+      ),
       Expanded(
           child: ListView.builder(
         itemCount: notCompletedHabits.length,
@@ -280,9 +299,14 @@ class _HabitListWidgetState extends State<HabitListWidget> {
                   habit.id,
                   !habit.isCompletedOnDay(widget.selectedDay),
                   widget.selectedDay);
-              setState(() {});
+              widget.refresh();
             },
-            title: Padding(
+            leading: Icon(
+              IconData(habit.iconCodePoint, fontFamily: 'MaterialIcons'),
+              color: Colors.red,
+            ),
+            title: Container(
+                alignment: Alignment.centerLeft,
                 padding: const EdgeInsets.symmetric(horizontal: 5),
                 child: Text(
                   habit.title,
@@ -293,22 +317,5 @@ class _HabitListWidgetState extends State<HabitListWidget> {
         },
       )),
     ]);
-  }
-}
-
-class TestWidget extends StatefulWidget {
-  final String string;
-  const TestWidget({super.key, required this.string});
-  @override
-  State<StatefulWidget> createState() => _TestWidgetState();
-}
-
-class _TestWidgetState extends State<TestWidget> {
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      widget.string,
-      style: const TextStyle(color: Colors.white),
-    );
   }
 }
