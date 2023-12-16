@@ -159,7 +159,15 @@ class HabitManager {
     _saveHabitsToPrefs();
   }
 
-// Log habits using json format
+  static int getStreakOnDay(DateTime day, Habit habit) {
+    int streak = 0;
+    while (habit.isCompletedOnDay(day)) {
+      streak++;
+      day = day.subtract(const Duration(days: 1));
+    }
+    return streak;
+  }
+
   static void logHabitManagerState() {
     _logger.i('Habit Manager State: ${json.encode(habits)}');
   }
