@@ -265,28 +265,30 @@ class _HabitListWidgetState extends State<HabitListWidget> {
         itemCount: completedHabits.length,
         itemBuilder: (BuildContext context, int index) {
           Habit habit = completedHabits[index];
-          return ListTile(
-            onTap: () {
-              HabitManager.setHabitCompletion(
-                  habit.id,
-                  !habit.isCompletedOnDay(widget.selectedDay),
-                  widget.selectedDay);
-              widget.refresh();
-            },
-            leading: Icon(
-              IconData(habit.iconCodePoint, fontFamily: 'MaterialIcons'),
-              color: Colors.white,
-            ),
-            title: Container(
-                alignment: Alignment.centerLeft,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                child: Text(
-                  habit.title,
-                  style: const TextStyle(color: Colors.white),
-                  overflow: TextOverflow.ellipsis,
-                )),
-          );
+          return Card(
+              color: const Color.fromARGB(20, 255, 255, 255),
+              child: ListTile(
+                onTap: () {
+                  HabitManager.setHabitCompletion(
+                      habit.id,
+                      !habit.isCompletedOnDay(widget.selectedDay),
+                      widget.selectedDay);
+                  widget.refresh();
+                },
+                leading: Icon(
+                  IconData(habit.iconCodePoint, fontFamily: 'MaterialIcons'),
+                  color: Colors.white,
+                ),
+                title: Container(
+                    alignment: Alignment.centerLeft,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 10, vertical: 10),
+                    child: Text(
+                      habit.title,
+                      style: const TextStyle(color: Colors.white),
+                      overflow: TextOverflow.ellipsis,
+                    )),
+              ));
         },
       )),
       Container(
@@ -298,29 +300,29 @@ class _HabitListWidgetState extends State<HabitListWidget> {
         itemCount: notCompletedHabits.length,
         itemBuilder: (BuildContext context, int index) {
           Habit habit = notCompletedHabits[index];
-          return ListTile(
-            shape: const RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(10))),
-            onTap: () {
-              HabitManager.setHabitCompletion(
-                  habit.id,
-                  !habit.isCompletedOnDay(widget.selectedDay),
-                  widget.selectedDay);
-              widget.refresh();
-            },
-            leading: Icon(
-              IconData(habit.iconCodePoint, fontFamily: 'MaterialIcons'),
-              color: Colors.red,
-            ),
-            title: Container(
-                alignment: Alignment.centerLeft,
-                padding: const EdgeInsets.symmetric(horizontal: 5),
-                child: Text(
-                  habit.title,
-                  style: const TextStyle(color: Colors.red),
-                  overflow: TextOverflow.ellipsis,
-                )),
-          );
+          return Card(
+              color: Color.fromARGB(20, 255, 255, 255),
+              child: ListTile(
+                onTap: () {
+                  HabitManager.setHabitCompletion(
+                      habit.id,
+                      !habit.isCompletedOnDay(widget.selectedDay),
+                      widget.selectedDay);
+                  widget.refresh();
+                },
+                leading: Icon(
+                  IconData(habit.iconCodePoint, fontFamily: 'MaterialIcons'),
+                  color: Colors.red,
+                ),
+                title: Container(
+                    alignment: Alignment.centerLeft,
+                    padding: const EdgeInsets.symmetric(horizontal: 5),
+                    child: Text(
+                      habit.title,
+                      style: const TextStyle(color: Colors.red),
+                      overflow: TextOverflow.ellipsis,
+                    )),
+              ));
         },
       )),
     ]);
