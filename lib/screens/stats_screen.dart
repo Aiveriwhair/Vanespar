@@ -194,47 +194,52 @@ class _DayCalendarWidgetState extends State<DayCalendarWidget> {
                 formatButtonShowsNext: false,
                 titleCentered: false,
                 titleTextStyle: const TextStyle(color: Colors.white)),
-            calendarBuilders:
-                CalendarBuilders(todayBuilder: (context, day, day2) {
-              Color fullColor = Color(widget.habits[0].color);
-              var habitsCompletable =
-                  widget.habits.where((e) => e.isCompletableOnDay(day));
-              var habitsCompleted =
-                  widget.habits.where((e) => e.isCompletedOnDay(day));
-              double lerpCoeff = 0;
-              if (habitsCompletable.isNotEmpty) {
-                lerpCoeff = habitsCompleted.length.toDouble() /
-                    habitsCompletable.length.toDouble();
-              }
-              return Padding(
-                  padding: const EdgeInsets.all(10),
-                  child: Container(
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(width: 2, color: Colors.grey),
-                        color:
-                            Color.lerp(uncompleteColor, fullColor, lerpCoeff)!),
-                  ));
-            }, defaultBuilder: (context, day, day2) {
-              Color fullColor = Color(widget.habits[0].color);
-              var habitsCompletable =
-                  widget.habits.where((e) => e.isCompletableOnDay(day));
-              var habitsCompleted =
-                  widget.habits.where((e) => e.isCompletedOnDay(day));
-              double lerpCoeff = 0;
-              if (habitsCompletable.isNotEmpty) {
-                lerpCoeff = habitsCompleted.length.toDouble() /
-                    habitsCompletable.length.toDouble();
-              }
-              return Padding(
-                  padding: const EdgeInsets.all(10),
-                  child: Container(
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        color:
-                            Color.lerp(uncompleteColor, fullColor, lerpCoeff)!),
-                  ));
-            })));
+            calendarBuilders: CalendarBuilders(
+              todayBuilder: (context, day, day2) {
+                Color fullColor = Color(widget.habits[0].color);
+                var habitsCompletable =
+                    widget.habits.where((e) => e.isCompletableOnDay(day));
+                var habitsCompleted =
+                    widget.habits.where((e) => e.isCompletedOnDay(day));
+                double lerpCoeff = 0;
+                if (habitsCompletable.isNotEmpty) {
+                  lerpCoeff = habitsCompleted.length.toDouble() /
+                      habitsCompletable.length.toDouble();
+                }
+                return Padding(
+                    padding: const EdgeInsets.all(10),
+                    child: Container(
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(width: 2, color: Colors.white),
+                          color: Color.lerp(
+                              uncompleteColor, fullColor, lerpCoeff)!),
+                    ));
+              },
+              defaultBuilder: (context, day, day2) {
+                Color fullColor = Color(widget.habits[0].color);
+                var habitsCompletable =
+                    widget.habits.where((e) => e.isCompletableOnDay(day));
+                var habitsCompleted =
+                    widget.habits.where((e) => e.isCompletedOnDay(day));
+                double lerpCoeff = 0;
+                if (habitsCompletable.isNotEmpty) {
+                  lerpCoeff = habitsCompleted.length.toDouble() /
+                      habitsCompletable.length.toDouble();
+                }
+                return Padding(
+                    padding: const EdgeInsets.all(10),
+                    child: Container(
+                      decoration: BoxDecoration(
+                          border: isSameDay(day, _selectedDay)
+                              ? Border.all(width: 2, color: Colors.black)
+                              : null,
+                          borderRadius: BorderRadius.circular(10),
+                          color: Color.lerp(
+                              uncompleteColor, fullColor, lerpCoeff)!),
+                    ));
+              },
+            )));
   }
 }
 
@@ -285,7 +290,7 @@ class _HabitListWidgetState extends State<HabitListWidget> {
         },
       )),
       Container(
-        width: 1,
+        width: .8,
         color: Colors.grey,
       ),
       Expanded(
@@ -294,6 +299,8 @@ class _HabitListWidgetState extends State<HabitListWidget> {
         itemBuilder: (BuildContext context, int index) {
           Habit habit = notCompletedHabits[index];
           return ListTile(
+            shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(10))),
             onTap: () {
               HabitManager.setHabitCompletion(
                   habit.id,
